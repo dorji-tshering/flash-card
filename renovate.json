@@ -1,5 +1,5 @@
 {
-	"extends": ["config:base", ":rebaseStalePrs"],
+	"extends": ["config:base", ":rebaseStalePrs", ":preserveSemverRanges"],
 	"schedule": "on friday and saturday",
 	"packageRules": [
 		{
