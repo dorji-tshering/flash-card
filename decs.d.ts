@@ -1,0 +1,9 @@
+declare module 'ace-builds/src-noconflict/ace';
+declare module 'ace-builds/src-noconflict/theme-monokai';
+declare module 'ace-builds/src-noconflict/mode-javascript';
+declare module 'ace-builds/src-noconflict/mode-python';
+declare module 'ace-builds/src-noconflict/mode-typescript';
+declare module 'ace-builds/src-noconflict/mode-html';
+declare module 'ace-builds/src-noconflict/mode-css';
+declare module 'ace-builds/src-noconflict/ext-language_tools';
+declare module 'ace-builds/src-noconflict/ext-elastic_tabstops_lite';
