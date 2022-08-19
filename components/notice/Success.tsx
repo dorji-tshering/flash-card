@@ -6,7 +6,7 @@ const Container = styled.div`
     position: absolute;
     width: 100%;
     height: auto;
-    padding: 15px;
+    padding: 25px;
     background: var(--green-color);
     color: var(--primary-text-color);
     z-index: 5;
@@ -50,7 +50,7 @@ const Success = ({ message, closeable, showNotification }: Props) => {
   return (
     <Container>
         <p className="message">
-            <MdCloudDone /><span>{ message }</span>
+            <MdCloudDone size={40} /><span>{ message }</span>
         </p>
         { closeable ? <span onClick={() => showNotification(false)} className="close"><CgClose/></span> : ''}
     </Container>

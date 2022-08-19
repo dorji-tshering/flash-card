@@ -161,6 +161,7 @@ const LoginRegister = ({ onClickOutside }) => {
                 setPassword('');
                 setLoading(false);
                 onClickOutside();
+                Router.reload();
             }).catch((err) => {
                 setSignupError(err.code);      
                 setLoading(false);  

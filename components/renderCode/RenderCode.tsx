@@ -19,6 +19,7 @@ hljs.configure({
 
 const Container = styled.pre`
     margin-top: 5px;
+    margin-bottom: 0;
 
     code {
         border-radius: 5px;
@@ -56,7 +57,7 @@ const RenderCode = ({ code, language }: Props) => {
 
     useEffect(() => {
         hljs.highlightAll();
-    },[])
+    },[code, language])
 
     return (
         <Container><code className={language}>{ sanitizeHtml(code, options) }</code></Container>

@@ -10,15 +10,17 @@ export default createGlobalStyle`
         --dark-background-color: #171716;
         --light-background-color: #2B2D2F;
         --border-color: #57606a;
-        --yellow: #FEAE12;
+        --yellow-color: #FEAE12;
         --red-color: #e91e63;
         --green-color: #388E3C;
         --fs-button-padding: 10px 20px;
+        --action-hover-box-shadow: rgb(0 0 0) 0px 1px 2px 0px, rgb(52 55 56) 0px 1px 3px 1px;
     }
 
     * {
         box-sizing: border-box;
         font-family: 'DM Sans', sans-serif;
+        transition: all .3s;
     }
 
     body {

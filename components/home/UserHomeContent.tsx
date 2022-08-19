@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { collection, getDocs, getDoc, doc, DocumentData, DocumentReference } from 'firebase/firestore';
-import RenderCode from '../renderCode/RenderCode';
 import { BiFilter } from 'react-icons/bi';
 
 
@@ -9,7 +8,7 @@ import { BiFilter } from 'react-icons/bi';
 import { useAuthValue } from '../utils/authContext';
 import { database } from '../../firebaseConfig';
 import Loader from '../loader/Loader';
-
+import NotesContainer from '../notes/NotesContainer';
 
 
 const Container = styled.div`
@@ -86,66 +85,6 @@ const Container = styled.div`
     } 
 `;
 
-const GridContainer = styled.div`
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 30px;
-
-    @media screen and (max-width: 991px) {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 20px;
-    }
-
-    @media screen and (max-width: 700px) {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 15px;
-    }
-`;
-
-const GridElement = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border-radius: 5px;
-    padding: 15px;
-    box-shadow: rgb(0 0 0 / 12%) 0px 2px 3px, rgb(0 0 0 / 24%) 0px 1px 50px;
-
-    .wrapper {
-        overflow: auto;
-        max-height: 250px;
-
-        p {
-            color: var(--light-text-color);
-            font-family: 'Roboto';
-            font-weight: 300;
-        }
-    }
-
-    .meta {
-        color: var(--secondary-text-color);
-        display: flex;
-        justify-content: space-between;
-        font-size: 12px;
-        margin-top: 10px;
-        
-        span {
-            font-family: 'Roboto';
-        }
-    }
-
-    @media screen and (max-width: 480px) {
-        p {
-            font-size: 12px;
-        }
-    }
-
-    @media screen and (max-width: 360px) {
-        p {
-            font-size: 10px;
-        }
-    }
-`;
-
 const UserHomeContent = () => {
     const [notes, setNotes] = useState<Array<DocumentData>>(null);
     const [filteredNotes, setFilteredNotes] = useState<Array<DocumentData>>(null);
@@ -206,7 +145,7 @@ const UserHomeContent = () => {
     return (
         <Container>
             { filteredNotes ? 
-                <div className="notes-container">
+                <>
                     <div className="top-bar">
                         <h4 className="title">Your Cards: <span className="card-count">{filteredNotes.length}</span></h4>
                         <div className="filter-wrapper">
@@ -222,24 +161,9 @@ const UserHomeContent = () => {
                             }
                         </div>
                     </div>
-                    <GridContainer>
-                        { filteredNotes.map((note, idx) => {
-                            return (
-                                <GridElement key={idx}>
-                                    { note.data().contentType === 'code' ? 
-                                        <div className="wrapper"><RenderCode language={note.data().language} code={note.data().data} /></div>
-                                        :
-                                        <div className="wrapper"><p>{ note.data().data }</p></div>
-                                    }
-                                    <p className="meta">
-                                        <span className="category">{ note.data().category }</span>
-                                        <span className="content-type">{ note.data().contentType }</span>
-                                    </p>                                  
-                                </GridElement>)
-                            }) 
-                        }
-                    </GridContainer>
-                </div>
+                    
+                    <NotesContainer notes={filteredNotes}/>
+                </>
                 :
 
                 <div className="no-notes-content">

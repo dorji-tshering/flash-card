@@ -143,7 +143,7 @@ const CreateCard = ({ setCreateCard }) => {
                 }
 
                 { showEditor && editor ? 
-                    <DynamicEditor language={language} goBack={goBack} contentType={editor}/> : ''
+                    <DynamicEditor language={language} goBack={goBack} contentType={editor} /> : ''
                 }
 
             </Container>

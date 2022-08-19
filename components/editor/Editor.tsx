@@ -1,7 +1,7 @@
-import { useEffect, useState, createContext } from 'react';
+import { useEffect, useState, createContext, SetStateAction, Dispatch } from 'react';
 import styled from 'styled-components';
 import { RiArrowDownSLine } from 'react-icons/ri';
-import { collection, addDoc, doc, getDoc, setDoc, arrayUnion, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, setDoc, arrayUnion, updateDoc, DocumentData } from 'firebase/firestore';
 import { useAuthValue } from '../utils/authContext';
 
 import ace from 'ace-builds/src-noconflict/ace';
@@ -112,9 +112,11 @@ interface Props {
     goBack: Function,
     contentType: string
     language: string
+    forEdit?: boolean,
+    note?: DocumentData
 }
 
-const Editor = ({ goBack, contentType, language }: Props) => {
+const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) => {
     const [showCategory, setShowCategory] = useState<boolean>(false);
     const [category, setCategory] = useState<string>(null);
     const [textContent, setTextContent] = useState<string>(null);
@@ -195,12 +197,29 @@ const Editor = ({ goBack, contentType, language }: Props) => {
         
     }
 
+    const updateCard = (event: React.FormEvent) => {
+        event.preventDefault();
+        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.id);
+        updateDoc(docRef, {
+            data: contentType === 'text' ? textContent : editor.getValue(),
+        }).then(() => {
+            // update the current data as well
+            note.data().data = contentType === 'text' ? textContent : editor.getValue();
+            showNotification('Card updated successfully. Refresh the page to see the updated content.');
+        }).catch(err => {
+            console.log(err.code);
+        });
+    }
+
     // set up ace code editor
     useEffect(() => {
         // only if the contentType is code 
         if(contentType === 'code') {
             editor = ace.edit('code-editor');
             editor.setTheme(monokai);
+            if(forEdit) {
+                editor.setValue(note.data().data);
+            }
             editor.setOptions({
                 autoScrollEditorIntoView: true,
                 copyWithEmptySelection: true,
@@ -240,7 +259,6 @@ const Editor = ({ goBack, contentType, language }: Props) => {
             <Container>
                 { notification ? 
                     <Success message={notification} closeable={true} showNotification={showNotification}/> : ''
-                
                 }
 
                 { showCategory ? 
@@ -250,27 +268,36 @@ const Editor = ({ goBack, contentType, language }: Props) => {
                 /> : ''}
 
                 <div className="form-wrapper">
-                    <form onSubmit={saveContent}>
+                    <form onSubmit={forEdit ? updateCard : saveContent}>
                         <div className="editor">
                             { contentType === 'text' ? 
                                 <textarea 
                                     name="text-content" 
                                     onChange={(e) => setTextContent(e.target.value)} 
                                     className="text-area" 
-                                    placeholder="Enter your text...">
+                                    placeholder="Enter your text..."
+                                    defaultValue={note.data().data}>
                                 </textarea>
                                 :
                                 <div id="code-editor"></div>
                             }
                         </div>
-                        <div className="select-category">
-                            <button type="button" onClick={() => setShowCategory(true)} >
-                                <span>{ category ? category : 'Select Category' }</span> <RiArrowDownSLine className="icon" size={20}/>
-                            </button>
-                        </div>
+                        { forEdit ? 
+                            ''
+                            :
+                            <div className="select-category">
+                                <button type="button" onClick={() => setShowCategory(true)} >
+                                    <span>{ category ? category : 'Select Category' }</span> <RiArrowDownSLine className="icon" size={20}/>
+                                </button>
+                            </div>
+                        }
                         <div className="actions">
-                            <button type="button" onClick={() => goBack()} className="back secondary-button">Back</button>
-                            <button type='submit' className="save primary-button">Save</button>
+                            <button type="button" onClick={() => goBack()} className="back secondary-button">
+                                { forEdit ? 'Cancel' : 'Back'}
+                            </button>
+                            <button type='submit' className="save primary-button">
+                                { forEdit ? 'Update' : 'Save'}
+                            </button>
                         </div>
                     </form>
                 </div>
