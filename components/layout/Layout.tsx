@@ -23,6 +23,7 @@ const Container = styled.div`
     max-height: 100vh;
 
     .main-content {
+        position: relative;
         flex: 2;
         overflow-y: auto;
     }
@@ -31,7 +32,7 @@ const Container = styled.div`
 interface childType {
     children: React.ReactNode
 }
-   
+
 const Layout = ({ children }: childType) => {
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const [showLogin, setShowLogin] = useState<boolean>(false);

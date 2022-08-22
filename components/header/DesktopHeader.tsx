@@ -5,9 +5,10 @@ import Link from 'next/link';
 import { BsQuestionOctagon } from 'react-icons/bs';
 import { doc, getDoc } from 'firebase/firestore';
 
-import { database } from '../../firebaseConfig';
+import { database } from '../../firebaseClient';
 import { useAuthValue } from '../utils/authContext';
-import { logOut } from '../utils/logout';
+import { logOutHelper } from '../utils/logoutHelper';
+import { useCategoryContext } from '../utils/categoryContext';
 
 const Container = styled.header`
     background: var(--dark-background-color);
@@ -102,20 +103,8 @@ interface Props {
 }
 
 const DesktopHeader = ({ setShowLogin, setCreateCard }: Props) => {
-    const [categories, setCategories] = useState<Array<string>>(null);
     const { currentUser } = useAuthValue();
-
-    // get categories for a user
-    useEffect(() => {
-        if(currentUser) {
-            const categoryDocRef = doc(database, "CategoryCollection", currentUser.uid);
-            getDoc(categoryDocRef).then((docSnap) => {
-                setCategories(docSnap.data().categories);
-            }).catch((err) => {
-                console.log(err.code);
-            });
-        }
-    },[currentUser])
+    const { categories } = useCategoryContext();
 
     return (
         <Container className="desktop">
@@ -130,7 +119,7 @@ const DesktopHeader = ({ setShowLogin, setCreateCard }: Props) => {
                 <div className="card-categories">
                     { categories ? 
                         <ul>
-                            { categories.map((category, idx) => {
+                            { categories.map((category: string, idx: number) => {
                                 return (
                                     <li key={idx}>
                                         <Link href={`/category/${category}`}>
@@ -140,12 +129,8 @@ const DesktopHeader = ({ setShowLogin, setCreateCard }: Props) => {
                             }) }
                         </ul>
                         :
-                        <div className="no-category">No Categories</div>
+                        ''
                     }
-                    <div className="add-category-info">
-                        <span className="tooltip">Adding new category is allowed only when you create a new card.</span>
-                        <BsQuestionOctagon className='icon' size={20}/>
-                    </div>
                 </div>
                 :
                 ''
@@ -153,7 +138,7 @@ const DesktopHeader = ({ setShowLogin, setCreateCard }: Props) => {
             <div className="action">
                 { currentUser ? 
                     <>
-                        <button onClick={logOut} className="logout secondary-button">Logout</button>
+                        <button onClick={logOutHelper} className="logout secondary-button">Logout</button>
                         <button onClick={() => setCreateCard(true)} className="create-card primary-button"> 
                             <span>Create</span>
                         </button>

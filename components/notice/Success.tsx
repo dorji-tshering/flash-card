@@ -1,26 +1,10 @@
 import styled from 'styled-components';
-import { MdCloudDone } from 'react-icons/md';
 import { CgClose } from 'react-icons/cg';
 
 const Container = styled.div`
-    position: absolute;
-    width: 100%;
-    height: auto;
-    padding: 25px;
+    padding: 10px 40px 10px 15px;
     background: var(--green-color);
-    color: var(--primary-text-color);
-    z-index: 5;
     border-radius: 5px;
-    top: -55px;
-
-    .message {
-        display: flex;
-        align-items: center;
-
-        span {
-            margin-left: 10px;
-        }
-    }
 
     .close {
         display: flex;
@@ -43,16 +27,16 @@ const Container = styled.div`
 interface Props {
     message: string;
     closeable: boolean;
-    showNotification: Function;
+    setNotification: Function;
 }
 
-const Success = ({ message, closeable, showNotification }: Props) => {
+const Success = ({ message, closeable, setNotification }: Props) => {
   return (
     <Container>
         <p className="message">
-            <MdCloudDone size={40} /><span>{ message }</span>
+            { message }
         </p>
-        { closeable ? <span onClick={() => showNotification(false)} className="close"><CgClose/></span> : ''}
+        { closeable ? <span onClick={() => setNotification(null)} className="close"><CgClose/></span> : ''}
     </Container>
   )
 }

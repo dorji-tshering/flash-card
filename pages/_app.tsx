@@ -1,23 +1,29 @@
 import { useState, useEffect } from 'react';
 import Router from 'next/router';
 import Head from 'next/head';
-import GlobalStyle from '../components/utils/global.css';
-import { AuthProvider } from '../components/utils/authContext';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
-import Loader from '../components/loader/Loader';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { auth } from '../firebaseClient';
 import "highlight.js/styles/atom-one-dark.css";
 
+import GlobalStyle from '../components/utils/global.css';
+import { AuthProvider } from '../components/utils/authContext';
+import { CatContextProvider } from '../components/utils/categoryContext';
+import Loader from '../components/loader/Loader';
+
+
 function MyApp({ Component, pageProps }) {
-	const [currentUser, setCurrentUser] = useState(null);
-	const [loading, setLoading] = useState(false);
-	
+	const [currentUser, setCurrentUser] = useState<User>(null);
+	const [categories, setCategories] = useState<string[]>(null);
+	const [loading, setLoading] = useState<boolean>(false);
+
 	useEffect(() => {
 		onAuthStateChanged(auth, (user) => {
-			setCurrentUser(user);
+			if(user) {
+				setCurrentUser(user);
+			} 
 		});
 	},[]);
-
+	
 	useEffect(() => {
 		Router.events.on('routeChangeStart', () => setLoading(true));
     	Router.events.on('routeChangeComplete', () => setLoading(false));
@@ -37,14 +43,19 @@ function MyApp({ Component, pageProps }) {
 			</Head>
 		  	<GlobalStyle/>
 		  	{ 
-			  	loading ? <Loader/>
+			  	loading ? <Loader background/>
 				:
 				<>
 				<AuthProvider value={{
 					currentUser: currentUser,
 					setCurrentUser: setCurrentUser
 					}}>
-					<Component {...pageProps} />
+					<CatContextProvider value={{
+						categories: categories,
+						setCategories: setCategories
+					}}>
+						<Component {...pageProps} />
+					</CatContextProvider>
 				</AuthProvider>
 				</>
 			}

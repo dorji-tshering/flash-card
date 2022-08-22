@@ -5,8 +5,8 @@ import Modal from '../modal/Modal';
 import styled from 'styled-components';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { emailValidate, passwordValidate } from '../utils/inputValidate';
-import { auth } from '../../firebaseConfig';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../firebaseClient';
+import { createUserWithEmailAndPassword, getIdToken, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
 import Loader from '../loader/Loader';
 import { useAuthValue } from '../utils/authContext';
 
@@ -121,60 +121,89 @@ const LoginRegister = ({ onClickOutside }) => {
 
     const passwordHide = () => {
         passwordRef.current.type = 'password';
-    }
+    } 
 
     // use react context to set the user after validation
-    const handleLogin = (event: React.FormEvent) => {
+    const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault();
-        setLoading(true);
         let validEmail = emailValidate(email, setError);
         let validPassword = passwordValidate(password, setError); 
 
         if(validEmail && validPassword) {
-            signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
-                setCurrentUser(userCredential.user);
+            let userCredential: UserCredential;
+            try {
+                setLoading(true);
+                userCredential = await signInWithEmailAndPassword(auth, email, password);
+            }catch(err) {
+                setLoginError(err.code);
+                setLoading(false);
+                return;
+            }
+
+            const user = userCredential.user;
+            const token = await getIdToken(user);
+
+            const response = await  fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    idToken: token
+                })
+            })
+
+            if(response.status === 200) {
                 setLoading(false);
                 onClickOutside();
-                Router.reload();
-            }).catch((err) => {
-                setLoginError(err.code);
-                console.log(err.code);
-                setLoading(false);
-            });
-        } else {
-            setLoading(false);
+                Router.replace('/');
+                setCurrentUser(user);
+            }
         }
-        
     }
 
-    const handleRegister = (event: React.FormEvent) => {
+    const handleRegister = async (event: React.FormEvent) => {
         event.preventDefault();
-        setLoading(true);
         let validEmail = emailValidate(email, setError);
         let validPassword = passwordValidate(password, setError);
 
         if(validEmail && validPassword) {
-            createUserWithEmailAndPassword(auth, email, password).then((res) => {
-                setCurrentUser(res.user);
-                console.log(res.user);
-                setEmail('');
-                setPassword('');
+            let userCredential: UserCredential;
+            try {
+                setLoading(true);
+                userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            }catch(err) {
+                setSignupError(err.code);
+                console.log(err.code);
+                setLoading(false);
+                return;
+            }
+
+            const user = userCredential.user;
+            const token = await getIdToken(user);
+
+            const response = await  fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    idToken: token
+                })
+            })
+
+            if(response.status === 200) {
                 setLoading(false);
                 onClickOutside();
-                Router.reload();
-            }).catch((err) => {
-                setSignupError(err.code);      
-                setLoading(false);  
-            });
-        } else {
-            setLoading(false);
+                Router.replace('/');
+                setCurrentUser(user);
+            }
         }
-        
     }
 
     return (
         <Modal onClickOutside={onClickOutside} className='login-register'>
-            { loading && <Loader/> }
+            { loading && <Loader background="transparent"/> }
             <Container className="login-register-wrapper">
                 { onLoginForm ? 
                     <form onSubmit={handleLogin} className="form-login" noValidate>

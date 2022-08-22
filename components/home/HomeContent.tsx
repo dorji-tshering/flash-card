@@ -1,25 +1,32 @@
 import styled from 'styled-components';
+import { useState } from 'react';
 
 import GuestHomeContent from "./GuestHomeContent";
 import UserHomeContent from "./UserHomeContent";
+import Loader from '../loader/Loader';
 import { useAuthValue } from '../utils/authContext';
 
 const Container = styled.div`
 
 `;
 
-const HomeContent = () => {
+interface Props {
+    notes: any[],
+    userId: string
+}
+
+const HomeContent = ({ notes, userId }: Props) => {
     const { currentUser } = useAuthValue();
 
     return (
             <Container>
-                { currentUser  ?
-                    <UserHomeContent/>
+                { userId && currentUser ?
+                    <UserHomeContent notes={notes} userId={userId}/>
                     :
                     <GuestHomeContent/>
                 }
             </Container>
         )
-    }
+    } 
 
 export default HomeContent;

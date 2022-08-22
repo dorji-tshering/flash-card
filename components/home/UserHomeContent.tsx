@@ -6,13 +6,13 @@ import { BiFilter } from 'react-icons/bi';
 
 
 import { useAuthValue } from '../utils/authContext';
-import { database } from '../../firebaseConfig';
+import { database } from '../../firebaseClient';
 import Loader from '../loader/Loader';
-import NotesContainer from '../notes/NotesContainer';
+import NotesContainer from '../containers/NotesContainer';
 
 
 const Container = styled.div`
-    padding: 50px 50px;
+    padding: 50px;
 
     .top-bar {
         display: flex;
@@ -83,68 +83,33 @@ const Container = styled.div`
     @media screen and (max-width: 480px) {
         padding: 30px 10px;
     } 
-`;
+`; 
 
-const UserHomeContent = () => {
-    const [notes, setNotes] = useState<Array<DocumentData>>(null);
-    const [filteredNotes, setFilteredNotes] = useState<Array<DocumentData>>(null);
+interface Props {
+    notes: any;
+    userId: string;
+}
+
+const UserHomeContent = ({ notes, userId }: Props) => {
+    const [oriNotes, setOriNotes] = useState(notes);
+    const [filteredNotes, setFilteredNotes] = useState(notes);
     const [showFilter, setShowFilter] = useState<boolean>(false);
-    const { currentUser }  = useAuthValue();
-
-    // retrieve all the notes of a user with default sorting
-    useEffect(() => {
-        const getNotes = async(ref: DocumentReference<DocumentData>, userId: string) =>{
-            const categoriesSnapshot = await getDoc<DocumentData>(ref);
-            const categoriesObject = categoriesSnapshot.data();
-
-            // return if user doesn't have any documents
-            if(!categoriesObject) {
-                return;
-            }
-
-            let tempNotes = [];
-
-            const promises: [] = categoriesObject.categories.map((category: string) => {
-                const userCategoriesRef = collection(database, 'CategoryCollection', userId, category);
-                return getDocs(userCategoriesRef); // returns a promise
-            });
-
-            // allQuerySnapshots contains array of documents from different collections
-            // querySnapshot: QuerySnapshot contains documents from single collection
-            Promise.all<DocumentData>(promises).then((allQuerySnapshots) => {
-                allQuerySnapshots.forEach((querySnapshot) => {
-                    // push documents to tempNotes from each collection
-                    tempNotes.push(...querySnapshot.docs);
-                });
-
-                setNotes(tempNotes);
-                setFilteredNotes(tempNotes);
-            }).catch((err) => {
-                console.log(err.code);
-            });
-        }
-
-        if(currentUser) {
-            const categoryDocRef = doc(database, "CategoryCollection", currentUser.uid);
-            getNotes(categoryDocRef, currentUser.uid).catch(err => console.log(err))
-        }
-    },[]);
 
     // filter function for notes 
     const filterNotes = (filter: string) => {
         if(filter === 'default') {
-            setFilteredNotes(notes);
+            setFilteredNotes(oriNotes);
         } else if (filter === 'known') {
-            setFilteredNotes(notes.filter((note) => note.data().known === true));
+            setFilteredNotes(oriNotes.filter((note) => note.known === true));
         } else if(filter === 'unknown') {
-            setFilteredNotes(notes.filter((note) => note.data().known === false));
+            setFilteredNotes(oriNotes.filter((note) => note.known === false));
         }
         setShowFilter(false);
     }
 
     return (
         <Container>
-            { filteredNotes ? 
+            { filteredNotes.length !== 0 ? 
                 <>
                     <div className="top-bar">
                         <h4 className="title">Your Cards: <span className="card-count">{filteredNotes.length}</span></h4>
@@ -167,7 +132,7 @@ const UserHomeContent = () => {
                 :
 
                 <div className="no-notes-content">
-                    You don't have any notes yeT
+                    <p>Looks like you don't have any notes for now. Start creating one!</p>
                 </div>
             }
         </Container>

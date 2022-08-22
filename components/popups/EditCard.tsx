@@ -26,22 +26,21 @@ const Container = styled.div`
 `;
 
 interface Props {
-    document: DocumentData,
+    note: any,
     goBack: Dispatch<SetStateAction<boolean>>
 }
 
-const EditCard = ({ document, goBack }: Props) => {
-    const [updatedContent, setUpdatedContent] = useState(null);
+const EditCard = ({ note, goBack }: Props) => {
 
     return (
         <Container>
             <div className="wrapper">
                 <DynamicEditor 
                     goBack={goBack} 
-                    contentType={document.data().contentType} 
-                    language={document.data().language}
+                    contentType={note.contentType} 
+                    language={note.language}
                     forEdit={true}
-                    note={document}
+                    note={note}
                 />
             </div>
         </Container>

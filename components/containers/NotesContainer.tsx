@@ -93,15 +93,15 @@ const GridElement = styled.div`
     }
 `;
 
-interface Notes {
-    notes: DocumentData[]
+interface Props { 
+    notes: any[]
 }
 
-const NotesContainer = ({ notes }: Notes) => {
+const NotesContainer = ({ notes }: Props) => {
     const { setShowSlider, setSliderData } = useSliderContextValue();
 
     // open notes slider 
-    const openSlider = (currentNote: DocumentData) => {
+    const openSlider = (currentNote: any) => {
         const sliderData = {
             notes: notes,
             currentNote: currentNote
@@ -112,25 +112,26 @@ const NotesContainer = ({ notes }: Notes) => {
     }
 
     return (
-            <GridContainer>
-                { notes.map((note, idx) => {
-                    return (
-                        <GridElement key={idx}>
-                            { note.data().contentType === 'code' ? 
-                                <div className="wrapper-content"><RenderCode language={note.data().language} code={note.data().data} /></div>
-                                :
-                                <div className="wrapper-content"><p>{ note.data().data }</p></div>
-                            }
-                            <p className="meta">
-                                <span className="category">{ note.data().category }</span>
-                                <span className="content-type">{ note.data().contentType }</span>
-                                <span onClick={() => openSlider(note)} className="view-note"><RiEyeLine/></span>
-                            </p>                                  
-                        </GridElement>)
-                    }) 
-                }
-            </GridContainer>
-        )
+        <GridContainer>
+            { notes.map((note, idx) => {
+                return (
+                    <GridElement key={idx}>
+                        { note.contentType === 'code' ? 
+                            <div className="wrapper-content"><RenderCode language={note.language} code={note.data} /></div>
+                            :
+                            <div className="wrapper-content"><p>{ note.data }</p></div>
+                        }
+                        <p className="meta">
+                            <span className="category">{ note.category }</span>
+                            <span className="content-type">{ note.contentType }</span>
+                            <span onClick={() => openSlider(note)} className="view-note"><RiEyeLine/></span>
+                        </p>                                  
+                    </GridElement>
+                    )
+                }) 
+            }
+        </GridContainer>
+    )
 }
 
 export default NotesContainer;

@@ -4,7 +4,7 @@ import { FiPlus } from 'react-icons/fi';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { useAuthValue } from '../utils/authContext';
-import { logOut } from '../utils/logout';
+import { logOut } from '../utils/logoutHelper';
 
 
 const Container = styled.header`

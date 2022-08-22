@@ -5,10 +5,14 @@ import { MdOutlineArrowBack, MdOutlineArrowForward, MdModeEdit, MdDelete } from 
 import { IoCloseSharp } from 'react-icons/io5';
 import { BsDot, BsToggle2Off, BsToggle2On } from 'react-icons/bs';
 import { useState } from 'react';
+import Router from 'next/router';
+
 import RenderCode from '../renderCode/RenderCode';
 import EditCard from '../popups/EditCard';
 import { useAuthValue } from '../utils/authContext';
-import { database } from '../../firebaseConfig';
+import { database } from '../../firebaseClient';
+import Success from '../notice/Success';
+import Loader from '../loader/Loader';
 
 const Container = styled.div`
     position: absolute;
@@ -29,6 +33,10 @@ const Container = styled.div`
     .center-content {
         justify-content: center;
         align-items: center;
+    }
+
+    .noti-wrapper {
+        position: absolute;
     }
 
     .middle {
@@ -156,7 +164,38 @@ const Container = styled.div`
         }
     }
 
+    .confirm-delete {
+        height: 100%;
+        width: 100%;
+        position: absolute;
 
+        .wrapper {
+            background: var(--theme-color);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            
+            .actions {
+                margin-top: 40px;
+
+                button {
+                    margin: 0px 10px;
+                    color: var(--primary-text-color);
+
+                    &.cancel {
+                        background: none;
+                        border: 1px solid var(--primary-text-color);
+                    }
+
+                    &.delete-note {
+                        background: var(--red-color);
+                        border: 1px solid var(--red-color);
+                    }
+                }
+            }
+        }
+
+    }
 
     @media screen and (max-width: 768px) {
         .middle {
@@ -220,47 +259,85 @@ interface Props {
 const NotesSlider = ({ notes, currentNote }: Props) => {  
     const [activeIdx, setActiveIdx] = useState<number>(notes.indexOf(currentNote));
     const [editCard, setEditCard] = useState<boolean>(false);
+    const [notification, setNotification] = useState<string>(null);
+    const [confirmDelete, showConfirmDelete] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const { setShowSlider } = useSliderContextValue();
     const { currentUser } = useAuthValue();
 
     const nextNote = () => {
-        console.log(activeIdx);
+        setLoading(true);
         if(activeIdx + 1 === notes.length) {
             setActiveIdx(0);
         }else {
             setActiveIdx(activeIdx + 1)
         }
+        setLoading(false);
     }
 
     const prevNote = () => {
+        setLoading(true);
         if(activeIdx - 1 < 0) {
             setActiveIdx(notes.length - 1);
         } else {
             setActiveIdx(activeIdx - 1);
         }
+        setLoading(false);
     }
 
-    const toggleKnown = (note: DocumentData) => {
-        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.data().id);
+    const toggleKnown = (note: any) => {
+        setLoading(true);
+        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.category, note.docId);
         updateDoc(docRef, {
-            known: !notes[activeIdx].data().known
+            known: !notes[activeIdx].known,
         }).then(() => {
-            alert('yeahhhhhh');
+            note.known = !notes[activeIdx].known;
+            setNotification('Toggle successfully updated.');
+            setLoading(false);
         }).catch((err) => {
             console.log(err.code);
+            setLoading(false);
         });
     }
 
-    const deleteNote = (note: DocumentData) => {
-        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.data().id);
+    const deleteNote = (note: any) => {
+        setLoading(true);
+        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.category, note.docId);
         deleteDoc(docRef).then(() => {
-            alert('hellyeah');
-        }).catch();
+            notes.splice(notes.indexOf(note), 1);
+            if(notes.length === 0) {
+                setLoading(false);
+                Router.replace(Router.asPath);
+            };
+            setLoading(false);
+            setNotification('Your note is deleted.')
+            showConfirmDelete(false);
+        }).catch((err) => {
+            console.log(err);
+            setLoading(false);
+        });
     }
 
     return (
         <Container>
-            { editCard ? <EditCard document={ notes[activeIdx] } goBack={() => setEditCard(false)}/> : ''}
+            { loading ? <Loader background="transparent"/> : ''}
+
+            { editCard ? <EditCard note={ notes[activeIdx] } goBack={() => setEditCard(false)}/> : ''}
+
+            { confirmDelete ? 
+                <div className="confirm-delete flex center-content">
+                    <div className="wrapper">
+                        <p>You sure about this?</p>
+                        <div className="actions">
+                            <button className="cancel" onClick={() => showConfirmDelete(false)}>Nope, cancel</button>
+                            <button className="delete-note" onClick={() => deleteNote(notes[activeIdx])}>Yes, delete</button>
+                        </div>
+                    </div>
+                </div>
+                :
+                ''
+            }
+
             <span onClick={() => setShowSlider(false)} className="close-slider flex center-content">
                 <IoCloseSharp size={30}/>
             </span>
@@ -268,23 +345,30 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
                 <span onClick={prevNote} className="previous flex center-content"><MdOutlineArrowBack size={30}/></span>
             </div>
             <div className="middle flex center-content">
+                { notification ? 
+                    <div className="noti-wrapper">
+                        <Success message={notification} setNotification={setNotification} closeable={true}/>
+                    </div>
+                    :
+                    ''
+                }
                 <div className="note-wrapper flex">
                     <div className="note-meta flex">
                         <span className="category flex center-content">
-                            <BsDot size={28} color="#FEAE12" className="icon"/>{ notes[activeIdx].data().category }
+                            <BsDot size={28} color="#FEAE12" className="icon"/>{ notes[activeIdx].category }
                         </span>
                         <span className="counter">{activeIdx + 1} of {notes.length}</span>
                         <span className="content-type flex center-content">
-                            <BsDot color="#e91e63" size={28} className="icon"/>{ notes[activeIdx].data().contentType }
+                            <BsDot color="#e91e63" size={28} className="icon"/>{ notes[activeIdx].contentType }
                         </span>
                     </div>
                     <div className="note-content">
-                        { notes[activeIdx].data().contentType === 'text' ?
-                            <p className="note">{notes[activeIdx].data().data}</p>
+                        { notes[activeIdx].contentType === 'text' ?
+                            <p className="note">{notes[activeIdx].data}</p>
                             :
                             <RenderCode 
-                                code={notes[activeIdx].data().data}
-                                language={notes[activeIdx].data().language}
+                                code={notes[activeIdx].data}
+                                language={notes[activeIdx].language}
                             />
                         }
                     </div>
@@ -293,15 +377,15 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
                             <MdModeEdit className="icon"/>
                             <span>Edit</span>
                         </button>
-                        <button onClick={toggleKnown} className={`toggle-known flex center-content ${notes[activeIdx].data().known ? 'known' : ''}`}>
+                        <button onClick={() => toggleKnown(notes[activeIdx])} className={`toggle-known flex center-content ${notes[activeIdx].known ? 'known' : ''}`}>
                             <span>Known</span>
-                            { notes[activeIdx].data().known ?                            
+                            { notes[activeIdx].known ?                            
                                 <BsToggle2On size={22} color="#0175FF" className="icon on"/>                          
                                 :                        
                                 <BsToggle2Off size={22} className="icon off"/>
                             }
                         </button>
-                        <button onClick={() => deleteNote(notes[activeIdx])} className="delete flex center-content">
+                        <button onClick={() => showConfirmDelete(true)} className="delete flex center-content">
                             <MdDelete className="icon"/>
                             <span>Delete</span>
                         </button>

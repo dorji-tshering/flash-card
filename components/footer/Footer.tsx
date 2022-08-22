@@ -22,7 +22,7 @@ const Container = styled.footer`
 
     .built-with {
         .next {
-            color: var(--yellow);
+            color: var(--yellow-color);
         }
 
         .firebase {

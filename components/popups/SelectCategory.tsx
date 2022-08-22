@@ -1,10 +1,11 @@
 import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
-import { database } from '../../firebaseConfig';
+import { database } from '../../firebaseClient';
 
 import AddCategory from './AddCategory';
 import { useAuthValue } from '../utils/authContext';
+import { useCategoryContext } from '../utils/categoryContext';
 
 
 
@@ -89,8 +90,9 @@ interface Props {
 
 const CategorySelect = ({ goBack, setCategory }: Props) => {
     const [showAddNew, setShowAddNew] = useState(false);
-    const [categories, setCategories] = useState<Array<string>>(null);
-    const { currentUser } = useAuthValue();
+    const [loading, setLoading] = useState<boolean>(false);
+    
+    const { categories } = useCategoryContext();
 
     const chooseCategory = (event: React.MouseEvent<HTMLLIElement>, category: string) => {
         setCategory(category);
@@ -102,25 +104,6 @@ const CategorySelect = ({ goBack, setCategory }: Props) => {
         event.currentTarget.style.transition = 'all .3s';
     }
 
-    // fetch categories and set
-    useEffect(() => {
-        if(currentUser) {
-            const categoryDocRef = doc(database, "CategoryCollection", currentUser.uid);
-            getDoc(categoryDocRef).then((docSnap) => {
-                setCategories(docSnap.data().categories);
-            }).catch((err) => {
-                console.log(err.code);
-            });
-        }
-    },[currentUser, categories])
-
-
-
-
-
-
-
-
     return (
         <Container>
             { showAddNew ? 
@@ -130,7 +113,7 @@ const CategorySelect = ({ goBack, setCategory }: Props) => {
             }
 
             <div className="category-wrapper">
-                { categories ? 
+                { categories.length > 0 ? 
                     <>
                         <h4>You have {categories.length} categories</h4>
                         <ul className="categories">

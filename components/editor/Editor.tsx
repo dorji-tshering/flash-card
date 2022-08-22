@@ -7,19 +7,15 @@ import { useAuthValue } from '../utils/authContext';
 import ace from 'ace-builds/src-noconflict/ace';
 import monokai from 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/mode-javascript';
-import 'ace-builds/src-noconflict/mode-python'; 
+import 'ace-builds/src-noconflict/mode-python';  
 import 'ace-builds/src-noconflict/mode-typescript';
 import 'ace-builds/src-noconflict/mode-css';
 
-import 'ace-builds/src-noconflict/ext-language_tools';
-import 'ace-builds/src-noconflict/ext-elastic_tabstops_lite';
-
 import SelectCategory from '../popups/SelectCategory';
-import { database } from '../../firebaseConfig';
+import { database } from '../../firebaseClient';
 import Success from '../notice/Success';
-
-
-//ace.config.set("basePath", "/node_modules/ace-builds/src-noconflict/");
+import Loader from '../loader/Loader';
+import Router from 'next/router';
 
 
 const Container  = styled.div`
@@ -69,9 +65,16 @@ const Container  = styled.div`
        }
    }
 
+   .noti-wrapper {
+        position: absolute;
+        top: -50px;
+        width: 100%;
+        z-index: 10;
+   }
+
    .editor {
         position: relative;
-        height: 280px;
+        height: 300px;
         width: 300px;
         margin-bottom: 30px;
 
@@ -87,6 +90,7 @@ const Container  = styled.div`
             bottom: 0;
             left: 0;
             border-radius: 4px;
+            margin-bottom: -20px;
 
             & * {
                 font-family: monospace;
@@ -113,14 +117,16 @@ interface Props {
     contentType: string
     language: string
     forEdit?: boolean,
-    note?: DocumentData
+    note?: any
 }
 
 const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) => {
+    const [doneEditing, setDoneEditing] = useState<boolean>(false);
     const [showCategory, setShowCategory] = useState<boolean>(false);
     const [category, setCategory] = useState<string>(null);
     const [textContent, setTextContent] = useState<string>(null);
-    const [notification, showNotification] = useState<string>(null);
+    const [notification, setNotification] = useState<string>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const catContextValue = {
         setCategory: setCategory,
@@ -152,20 +158,21 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
             }
         }
 
-        let userId: string = currentUser.uid;
-        const categoryCollectionRef = collection(database, 'CategoryCollection', userId, category );
+        setLoading(true);
+
+        const categoryCollectionRef = collection(database, 'CategoryCollection', currentUser.uid, category );
 
         const cardData = {
             data: contentType === 'text' ? textContent : editor.getValue(),
             category: category,
-            userId: userId,
+            userId: currentUser.uid,
             contentType : contentType,
             language: contentType === 'code' ? language : null,
             known: false
         }
 
         // create or update category array of a user
-        const docRef = doc(database, "CategoryCollection", userId);
+        const docRef = doc(database, "CategoryCollection", currentUser.uid);
         getDoc(docRef).then((doc) => {
             if(doc.exists()) {
                 updateDoc(docRef, {
@@ -188,52 +195,49 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
 
         // add notes under the specified category collection
         addDoc(categoryCollectionRef, cardData).then((res) => {
-            if(res) {
-                showNotification('Card saved successfully.');
-            }
+            setNotification('Card saved successfully.');
+            setLoading(false);
+            Router.replace(`/category/${category}`);
         }).catch((err) => {
             console.log(err);
+            setLoading(false);
         });
         
     }
 
     const updateCard = (event: React.FormEvent) => {
         event.preventDefault();
-        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.id);
+        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.category, note.docId);
+        setLoading(true);
         updateDoc(docRef, {
             data: contentType === 'text' ? textContent : editor.getValue(),
         }).then(() => {
-            // update the current data as well
-            note.data().data = contentType === 'text' ? textContent : editor.getValue();
-            showNotification('Card updated successfully. Refresh the page to see the updated content.');
+            note.data = contentType === 'text' ? textContent : editor.getValue();
+            setDoneEditing(true);
+            setLoading(false);
+            setNotification('Card updated successfully.');
         }).catch(err => {
             console.log(err.code);
+            setLoading(false);
         });
     }
 
-    // set up ace code editor
+    // set up ace code editor 
     useEffect(() => {
         // only if the contentType is code 
         if(contentType === 'code') {
             editor = ace.edit('code-editor');
             editor.setTheme(monokai);
             if(forEdit) {
-                editor.setValue(note.data().data);
+                editor.setValue(note.data);
             }
             editor.setOptions({
-                autoScrollEditorIntoView: true,
-                copyWithEmptySelection: true,
                 useWorker: false,
-                hScrollBarAlwaysVisible: false,
-                vScrollBarAlwaysVisible: false,
                 showGutter: false,
-                animatedScroll: true,
-                scrollPastEnd: true,
-                wrap: true,
-                enableBasicAutocompletion: true,
-                enableLiveAutocompletion:   true,
-                enableSnippets: true
+                cursorStyle: 'slim',
+                wrap: true
             });
+            
 
             // set mode based on language selected by the user
             switch(language) {
@@ -252,13 +256,19 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
                 
             }
         }
-    })
+    },[]);
 
     return (
         <CategoryContext.Provider value={catContextValue}>
             <Container>
+                { loading ? <Loader background="transparent"/> : ''}
+
                 { notification ? 
-                    <Success message={notification} closeable={true} showNotification={showNotification}/> : ''
+                    <div className="noti-wrapper">
+                        <Success message={notification} closeable={true} setNotification={setNotification}/>
+                    </div>
+                    :
+                    ''
                 }
 
                 { showCategory ? 
@@ -276,7 +286,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
                                     onChange={(e) => setTextContent(e.target.value)} 
                                     className="text-area" 
                                     placeholder="Enter your text..."
-                                    defaultValue={note.data().data}>
+                                    defaultValue={note?.data}>
                                 </textarea>
                                 :
                                 <div id="code-editor"></div>
@@ -293,7 +303,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
                         }
                         <div className="actions">
                             <button type="button" onClick={() => goBack()} className="back secondary-button">
-                                { forEdit ? 'Cancel' : 'Back'}
+                                { forEdit ? doneEditing ? 'Done' : 'Cancel' : 'Back'}
                             </button>
                             <button type='submit' className="save primary-button">
                                 { forEdit ? 'Update' : 'Save'}
