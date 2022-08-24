@@ -12,7 +12,7 @@ import EditCard from '../popups/EditCard';
 import { useAuthValue } from '../utils/authContext';
 import { database } from '../../firebaseClient';
 import Success from '../notice/Success';
-import Loader from '../loader/Loader';
+import Loader from '../loader/Loader'; 
 
 const Container = styled.div`
     position: absolute;
@@ -23,7 +23,10 @@ const Container = styled.div`
     height: 100%;
     top: 0;
     right: 0;
-    background: var(--main-background-color);
+    background: #0f0c29;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to top, #24243e, #302b63, #0f0c29);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to top, #24243e, #302b63, #0f0c29); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
     z-index: 99;
 
     .flex {
@@ -305,6 +308,12 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
         const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.category, note.docId);
         deleteDoc(docRef).then(() => {
             notes.splice(notes.indexOf(note), 1);
+            if(activeIdx === 0) {
+                setActiveIdx(notes.length -1);
+            }else {
+                setActiveIdx(activeIdx - 1);
+            }
+            
             if(notes.length === 0) {
                 setLoading(false);
                 Router.replace(Router.asPath);

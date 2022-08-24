@@ -13,9 +13,10 @@ import Loader from '../components/loader/Loader';
 
 function MyApp({ Component, pageProps }) {
 	const [currentUser, setCurrentUser] = useState<User>(null);
-	const [categories, setCategories] = useState<string[]>(null);
+	const [categories, setCategories] = useState<string[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 
+	console.log(categories);
 	useEffect(() => {
 		onAuthStateChanged(auth, (user) => {
 			if(user) {

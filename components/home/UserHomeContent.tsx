@@ -1,13 +1,8 @@
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
-import { collection, getDocs, getDoc, doc, DocumentData, DocumentReference } from 'firebase/firestore';
+import { useState } from 'react';
 import { BiFilter } from 'react-icons/bi';
+import { GiNotebook } from 'react-icons/gi'
 
-
-
-import { useAuthValue } from '../utils/authContext';
-import { database } from '../../firebaseClient';
-import Loader from '../loader/Loader';
 import NotesContainer from '../containers/NotesContainer';
 
 
@@ -76,6 +71,12 @@ const Container = styled.div`
         }        
     }
 
+    .no-notes-content {
+        text-align: center;
+        margin-top: 100px;
+        color: var(--secondary-text-color);
+    }
+
     @media screen and (max-width: 991px) {
         padding: 40px 30px;
     }
@@ -132,7 +133,8 @@ const UserHomeContent = ({ notes, userId }: Props) => {
                 :
 
                 <div className="no-notes-content">
-                    <p>Looks like you don't have any notes for now. Start creating one!</p>
+                    <p className="icon"><GiNotebook size={50}/></p>
+                    <p>Looks like you don't have any notes for now. Start creating one.</p>
                 </div>
             }
         </Container>

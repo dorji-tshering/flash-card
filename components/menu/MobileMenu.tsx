@@ -1,9 +1,12 @@
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
-import { CgClose } from 'react-icons/cg';
+import { useAuthValue } from '../utils/authContext';
+import UserMenu from './UserMenu';
+import GuestMenu from './GuestMenu';
+import { RiArrowLeftFill } from 'react-icons/ri';
 
 const Container = styled.div`
-    width: 100vw;
+    width: 280px;
     position: fixed;
     top: 0;
     left: 0;
@@ -11,6 +14,8 @@ const Container = styled.div`
     height: 100vh;
     transform: translateX(-100%);
     background: var(--main-background-color);
+    z-index: 1;
+    overflow-y: auto;
 
     &.show {
         transform: none;
@@ -19,8 +24,16 @@ const Container = styled.div`
 
     .close-menu {
         position: absolute;
-        top: 20px;
-        right: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        height: 30px;
+        width: 30px;
+        top: 10px;
+        right: 10px;
+        background: var(--light-background-color);
+        cursor: pointer;
     }
 
 `;
@@ -32,6 +45,7 @@ interface MenuProps {
 
 const MobileMenu = ({ showMenu, setShowMenu}: MenuProps) => {
     const ref = useRef(null);
+    const { currentUser } = useAuthValue();
 
     function hideMenu() {
         // set style only once
@@ -39,18 +53,16 @@ const MobileMenu = ({ showMenu, setShowMenu}: MenuProps) => {
             ref.current.style.transition = 'all .3s';
         }
         setShowMenu(false);
-    }
+    } 
 
     return (
         <Container ref={ref} className={showMenu ? 'show' : ''}>
-            <ul className="menu-items">
-                <li>Menu One</li>
-                <li>Menu One</li>
-                <li>Menu One</li>
-                <li>Menu One</li>
-            </ul>
-
-        <span className="close-menu" onClick={hideMenu}> <CgClose size='24'/></span>
+            { currentUser ? 
+                <UserMenu/>
+            :
+                <GuestMenu/>
+            }
+        <span className="close-menu" onClick={hideMenu}> <RiArrowLeftFill size='18'/></span>
         </Container>
     );
 }

@@ -1,8 +1,8 @@
-import { useEffect, useState, createContext, SetStateAction, Dispatch } from 'react';
+import { useEffect, useState, createContext } from 'react';
+import Router from 'next/router';
 import styled from 'styled-components';
 import { RiArrowDownSLine } from 'react-icons/ri';
-import { collection, addDoc, doc, getDoc, setDoc, arrayUnion, updateDoc, DocumentData } from 'firebase/firestore';
-import { useAuthValue } from '../utils/authContext';
+import { collection, addDoc, doc, getDoc, setDoc, arrayUnion, updateDoc } from 'firebase/firestore';
 
 import ace from 'ace-builds/src-noconflict/ace';
 import monokai from 'ace-builds/src-noconflict/theme-monokai';
@@ -15,7 +15,8 @@ import SelectCategory from '../popups/SelectCategory';
 import { database } from '../../firebaseClient';
 import Success from '../notice/Success';
 import Loader from '../loader/Loader';
-import Router from 'next/router';
+import { useAuthValue } from '../utils/authContext';
+import { useCategoryContext } from '../utils/categoryContext';
 
 
 const Container  = styled.div`
@@ -127,14 +128,54 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
     const [textContent, setTextContent] = useState<string>(null);
     const [notification, setNotification] = useState<string>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [codeEditor, setCodeEditor] = useState(null);
 
+    // top level context 
+    const { categories, setCategories } = useCategoryContext();
+
+    // this is different to utils/useCategorytContext
     const catContextValue = {
         setCategory: setCategory,
     }
 
     const { currentUser } = useAuthValue();
 
-    let editor: any;
+    // set up ace code editor 
+    useEffect(() => {
+        // only if the contentType is code 
+        let editor: any;
+        if(contentType === 'code') {
+            editor = ace.edit('code-editor');
+            editor.setTheme(monokai);
+            if(forEdit) {
+                editor.setValue(note.data);
+            }
+            editor.setOptions({
+                useWorker: false,
+                showGutter: false,
+                cursorStyle: 'slim',
+                wrap: true
+            });
+
+            // set mode based on language selected by the user
+            switch(language) {
+                case 'javascript':
+                    editor.session.setMode("ace/mode/javascript");
+                    break;
+                case 'typescript':
+                    editor.session.setMode("ace/mode/typescript");
+                    break;
+                case 'python':
+                    editor.session.setMode("ace/mode/python");
+                    break;
+                default:
+                    editor.session.setMode("ace/mode/css");
+                    break;
+                
+            }
+        }
+        setCodeEditor(editor);
+    },[]);
 
     // save card
     const saveContent = (event: React.FormEvent) => {
@@ -152,7 +193,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
                 return;
             }
         } else if(contentType === 'code') {
-            if(!/\S/.test(editor.getValue())) {
+            if(!/\S/.test(codeEditor.getValue())) {
                 alert('Your code note is empty');
                 return;
             }
@@ -163,7 +204,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
         const categoryCollectionRef = collection(database, 'CategoryCollection', currentUser.uid, category );
 
         const cardData = {
-            data: contentType === 'text' ? textContent : editor.getValue(),
+            data: contentType === 'text' ? textContent : codeEditor.getValue(),
             category: category,
             userId: currentUser.uid,
             contentType : contentType,
@@ -171,20 +212,24 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
             known: false
         }
 
-        // create or update category array of a user
+        // create or update user document containing categroies field
         const docRef = doc(database, "CategoryCollection", currentUser.uid);
         getDoc(docRef).then((doc) => {
             if(doc.exists()) {
                 updateDoc(docRef, {
-                    categories: arrayUnion(category)
-                }).then((res) => {
-                    console.log('');
+                    categories: arrayUnion(category),
+                }).then(() => {
+                    if(!categories.includes(category)) {
+                        setCategories((categories: string[]) => [...categories, category]);
+                    }
                 }).catch((err) => {
                     console.log(err.code); 
                 });
             }else {
                 setDoc(docRef, {
                     categories: [category]
+                }).then(() => {
+                    setCategories([category]);
                 }).catch((err) => {
                     console.log(err.code);
                 });
@@ -210,9 +255,9 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
         const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.category, note.docId);
         setLoading(true);
         updateDoc(docRef, {
-            data: contentType === 'text' ? textContent : editor.getValue(),
+            data: contentType === 'text' ? textContent : codeEditor.getValue(),
         }).then(() => {
-            note.data = contentType === 'text' ? textContent : editor.getValue();
+            note.data = contentType === 'text' ? textContent : codeEditor.getValue();
             setDoneEditing(true);
             setLoading(false);
             setNotification('Card updated successfully.');
@@ -222,41 +267,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
         });
     }
 
-    // set up ace code editor 
-    useEffect(() => {
-        // only if the contentType is code 
-        if(contentType === 'code') {
-            editor = ace.edit('code-editor');
-            editor.setTheme(monokai);
-            if(forEdit) {
-                editor.setValue(note.data);
-            }
-            editor.setOptions({
-                useWorker: false,
-                showGutter: false,
-                cursorStyle: 'slim',
-                wrap: true
-            });
-            
-
-            // set mode based on language selected by the user
-            switch(language) {
-                case 'javascript':
-                    editor.session.setMode("ace/mode/javascript");
-                    break;
-                case 'typescript':
-                    editor.session.setMode("ace/mode/typescript");
-                    break;
-                case 'python':
-                    editor.session.setMode("ace/mode/python");
-                    break;
-                default:
-                    editor.session.setMode("ace/mode/css");
-                    break;
-                
-            }
-        }
-    },[]);
+    
 
     return (
         <CategoryContext.Provider value={catContextValue}>
@@ -275,6 +286,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
                 <SelectCategory 
                     goBack={() => setShowCategory(false)}
                     setCategory={setCategory}
+                    category={category}
                 /> : ''}
 
                 <div className="form-wrapper">

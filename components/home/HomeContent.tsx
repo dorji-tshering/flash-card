@@ -16,11 +16,10 @@ interface Props {
 }
 
 const HomeContent = ({ notes, userId }: Props) => {
-    const { currentUser } = useAuthValue();
 
     return (
             <Container>
-                { userId && currentUser ?
+                { userId ?
                     <UserHomeContent notes={notes} userId={userId}/>
                     :
                     <GuestHomeContent/>

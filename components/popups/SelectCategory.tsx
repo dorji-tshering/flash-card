@@ -84,11 +84,12 @@ const Container = styled.div`
 
 interface Props {
     goBack: Function,
-    setCategory: Function
+    setCategory: Function,
+    category: string,
 }
 
 
-const CategorySelect = ({ goBack, setCategory }: Props) => {
+const CategorySelect = ({ goBack, category, setCategory }: Props) => {
     const [showAddNew, setShowAddNew] = useState(false);
     const [loading, setLoading] = useState<boolean>(false);
     
@@ -117,7 +118,7 @@ const CategorySelect = ({ goBack, setCategory }: Props) => {
                     <>
                         <h4>You have {categories.length} categories</h4>
                         <ul className="categories">
-                            { categories.map((cat, idx) => 
+                            { categories.map((cat: string, idx: number) => 
                                 <li onClick={(event) => chooseCategory(event, cat)} key={idx}>{cat}</li>
                             ) }
                         </ul>
@@ -132,8 +133,14 @@ const CategorySelect = ({ goBack, setCategory }: Props) => {
                             <p>You don't have any categories. Add new to get started. After adding new category, head back to the editor.</p>
                         </div>
                         <div className="actions">
-                            <button onClick={() => goBack()} className="done secondary-button">Back</button>
-                            <button onClick={() => setShowAddNew(true)} className="add-new primary-button">Add new</button>
+                            { category ?
+                                <button onClick={() => goBack()} className="primary-button">Added</button>
+                            :
+                                <>
+                                    <button onClick={() => goBack()} className="done secondary-button">Back</button>
+                                    <button onClick={() => setShowAddNew(true)} className="add-new primary-button">Add new</button>
+                                </>
+                            }
                         </div>
                     </>
                 }

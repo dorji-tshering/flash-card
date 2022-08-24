@@ -1,4 +1,3 @@
-import { DocumentData } from '@firebase/firestore';
 import styled from 'styled-components';
 import { RiEyeLine } from 'react-icons/ri';
 
@@ -18,6 +17,10 @@ const GridContainer = styled.div`
     @media screen and (max-width: 700px) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 15px;
+    }
+
+    @media screen and (max-width: 480px) {
+        gap: 5px;
     }
 `;
 
@@ -69,6 +72,8 @@ const GridElement = styled.div`
     }
 
     @media screen and (max-width: 480px) {
+        padding: 10px;
+
         .wrapper-content {
             p {
                 font-size: 12px;  

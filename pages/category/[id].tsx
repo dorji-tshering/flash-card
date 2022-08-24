@@ -12,7 +12,7 @@ import { useEffect } from 'react';
 
 export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePropsContext) => {
     let notes: Object[] = [];
-    let noteCategories: string[] = null;
+    let noteCategories: string[] = [];
 
     const cookieObject: string = ctx.req.headers.cookie;
     // return if no cookie found
@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
         return { 
             props: {
                 notes: notes,
-                noteCategories: noteCategories
+                noteCategories: noteCategories,
             }
         }
     }
@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
     const getNotes = async (collRef: CollectionReference<DocumentData>, uid: string) => {
         const catSnapShot = await getDoc(doc(database, 'CategoryCollection', uid));
         if(catSnapShot.data().categories.length > 0) {
-            noteCategories = catSnapShot.data()?.categories;
+            noteCategories = catSnapShot.data().categories;
         }else {
             return;
         }
@@ -51,6 +51,17 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
         const decodedClaims = await verifySessionCookie(sessionCookie, true);
         const uid = decodedClaims.uid;
         const collRef = collection(database, 'CategoryCollection', uid, ctx.params.id as string);
+        const document = await getDoc(doc(database, 'CategoryCollection', uid));
+        console.log(document.data().categories);
+        // redirect for non-existent categories
+        if(!document.data().categories.includes(ctx.params.id)) {
+            return {
+                redirect: {
+                    permanent: false,
+                    destination: `/404`,
+                  }
+            }
+        }
         await getNotes(collRef, uid);
 
     } catch(err) {
@@ -58,15 +69,20 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
         return {
             props: {
                 notes: notes,
-                noteCategories: noteCategories
+                noteCategories: noteCategories,
             }
         }
     }
 
+    ctx.res.setHeader(
+        'Cache-Control',
+        'public, s-maxage=10, stale-while-revalidate=59'
+    );
+
     return {
         props: {
             notes: notes,
-            noteCategories: noteCategories
+            noteCategories: noteCategories,
         }
     }
 }
@@ -75,9 +91,9 @@ const CardCategory = ({ notes, noteCategories }) => {
     const { categories, setCategories } = useCategoryContext();
 
     useEffect(() => {
-        if(!categories) {
-            setCategories(noteCategories);
-        }
+            if(!categories.length >= noteCategories.length || categories.length === 0) {
+                setCategories(noteCategories);
+            }
     },[])
 
     return (

@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
     let userId: string = null;
     let notes: Object[] = [];
-    let noteCategories: string[] = null;
+    let noteCategories: string[] = [];
 
     const cookieObject: string = ctx.req.headers.cookie;
     // return if no cookie found
@@ -76,7 +76,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
         }
     }
 
-    console.log(noteCategories);
+    ctx.res.setHeader(
+        'Cache-Control',
+        'public, s-maxage=10, stale-while-revalidate=59'
+    );
 
     return {
         props: {
@@ -88,10 +91,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
 }
 
 export default function Home({ notes, userId, noteCategories }) {
-    const { setCategories } = useCategoryContext();
+    const { categories, setCategories } = useCategoryContext();
 
     useEffect(() => {
-        setCategories(noteCategories);
+        if(categories.length === 0) {
+            setCategories(noteCategories);
+        }
     },[])
 
     return (

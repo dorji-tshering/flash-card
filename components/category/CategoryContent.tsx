@@ -19,6 +19,7 @@ const Container = styled.div`
         h4 {
             margin: 0;
             text-align: center;
+            color: var(--secondary-text-color);
         }
     }
 

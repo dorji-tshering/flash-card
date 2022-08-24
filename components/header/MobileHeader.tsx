@@ -4,7 +4,8 @@ import { FiPlus } from 'react-icons/fi';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { useAuthValue } from '../utils/authContext';
-import { logOut } from '../utils/logoutHelper';
+import { logOutHelper } from '../utils/logoutHelper';
+import { BiLogOutCircle } from 'react-icons/bi';
 
 
 const Container = styled.header`
@@ -16,7 +17,7 @@ const Container = styled.header`
     height: 80px;
 
     .logo {
-        margin-left: 30px;
+        margin-left: 15px;
 
         height: 40px;
         
@@ -31,8 +32,20 @@ const Container = styled.header`
         align-items: center;
 
         .logout {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin-right: 15px;
+            min-width: auto;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            padding: 0;
         }
+    }
+
+    .menu-button {
+        cursor: pointer;
     }
 `;
 
@@ -60,7 +73,7 @@ const MobileHeader = ({ setShowMenu, setShowLogin, setCreateCard }: MenuProps) =
             <div className="action">
                 { currentUser ? 
                     <>
-                        <button onClick={logOut} className="logout secondary-button">Logout</button>
+                        <button onClick={logOutHelper} className="logout secondary-button"><BiLogOutCircle size={20}/></button>
                         <button onClick={() => setCreateCard(true)} className="create-card primary-button"> 
                             <span>Create</span>
                         </button>

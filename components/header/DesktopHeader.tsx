@@ -38,6 +38,10 @@ const Container = styled.header`
                 a {
                     color: var(--primary-text-color);
                     text-transform: capitalize;
+
+                    &:hover {
+                        color: var(--yellow-color);
+                    }
                 } 
             }
         }
@@ -92,6 +96,13 @@ const Container = styled.header`
 
         .logout {
             margin-right: 10px;
+        }
+    }
+
+    @media screen and (max-width: 1190px) {
+        .card-categories {
+            max-width: 400px;
+            overflow-x: auto;
         }
     }
 

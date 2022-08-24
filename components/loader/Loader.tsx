@@ -19,7 +19,9 @@ const Container = styled.div<Props>`
     z-index: 9999;
 
     .lds-ring {
-        display: inline-block;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         position: relative;
         width: 80px;
         height: 80px;

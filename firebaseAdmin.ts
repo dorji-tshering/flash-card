@@ -17,7 +17,7 @@ export const verifyIdToken = (token: string) => {
 
 export const createSessionCookie = (idToken: string, expiresIn: SessionCookieOptions) => {
     return admin.auth().createSessionCookie(idToken, expiresIn);
-}
+} 
 
 export const verifySessionCookie = (sessionCookie: string, checkRevoked: boolean) => {
     return admin.auth().verifySessionCookie(sessionCookie, checkRevoked);
