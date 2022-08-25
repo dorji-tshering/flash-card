@@ -20,8 +20,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             })
         );
     res.status(200).send(JSON.stringify({status: 'success'}));
-
     }).catch((err) => {
-        res.status(401).send('UNAUTHORIZED REQUEST');
+        res.json(err);
+        res.status(401);
     });  
 }

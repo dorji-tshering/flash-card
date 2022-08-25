@@ -23,10 +23,7 @@ const Container = styled.div`
     height: 100%;
     top: 0;
     right: 0;
-    background: #0f0c29;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to top, #24243e, #302b63, #0f0c29);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to top, #24243e, #302b63, #0f0c29); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-
+    background: var(--light-background-color);
     z-index: 99;
 
     .flex {
@@ -74,7 +71,7 @@ const Container = styled.div`
                 padding: 20px;
                 border-radius: 10px;
                 border: 1px solid var(--border-color);
-                background: var(--dark-background-color);
+                background: var(--main-background-color);
 
                 .note {
                     font-family: Roboto;
@@ -173,7 +170,7 @@ const Container = styled.div`
         position: absolute;
 
         .wrapper {
-            background: var(--theme-color);
+            background: var(--dark-background-color);
             border-radius: 10px;
             padding: 30px;
             text-align: center;

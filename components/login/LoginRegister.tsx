@@ -158,6 +158,8 @@ const LoginRegister = ({ onClickOutside }) => {
                 onClickOutside();
                 Router.replace('/');
                 setCurrentUser(user);
+            }else if(response.status === 401) {
+                console.log(response.json());
             }
         }
     }
