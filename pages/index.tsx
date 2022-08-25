@@ -58,7 +58,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
     }
 
     try {
-        const sessionCookie = cookie.parse(cookieObject).__session;
+        const sessionCookie = cookie.parse(cookieObject)['__session'];
         const decodedClaims = await verifySessionCookie(sessionCookie, true);
         const uid = decodedClaims.uid;
         userId = uid;
@@ -75,11 +75,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
             }
         }
     }
-
-    ctx.res.setHeader(
-        'Cache-Control',
-        'public, s-maxage=10, stale-while-revalidate=59'
-    );
 
     return {
         props: {

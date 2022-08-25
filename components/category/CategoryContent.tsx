@@ -73,8 +73,6 @@ const CategoryContent = ({ notes }) => {
             console.log(err);
             setLoading(false);
         }
-
-
     }
 
     return (

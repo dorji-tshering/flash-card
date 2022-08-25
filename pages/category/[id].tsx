@@ -45,8 +45,6 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
         });
     }
 
-    console.log(cookie.parse(cookieObject)['__session']);
-
     // verify user session and get notes
     try {
         const sessionCookie = cookie.parse(cookieObject)['__session'];
@@ -54,7 +52,6 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
         const uid = decodedClaims.uid;
         const collRef = collection(database, 'CategoryCollection', uid, ctx.params.id as string);
         const document = await getDoc(doc(database, 'CategoryCollection', uid));
-        console.log(document.data().categories);
         // redirect for non-existent categories
         if(!document.data().categories.includes(ctx.params.id)) {
             return {
@@ -75,11 +72,6 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
             }
         }
     }
-
-    ctx.res.setHeader(
-        'Cache-Control',
-        'public, s-maxage=10, stale-while-revalidate=59'
-    );
 
     return {
         props: {
