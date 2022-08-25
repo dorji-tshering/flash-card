@@ -5,7 +5,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     res.setHeader("Set-Cookie",
-        cookie.serialize("session", '', {
+        cookie.serialize("__session", '', {
             maxAge: -1,
             path: "/",
         })

@@ -11,7 +11,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         expiresIn: expiresIn
     }).then((sessionCookie) => {
         res.setHeader("Set-Cookie",
-            cookie.serialize("session", sessionCookie, {
+            cookie.serialize("__session", sessionCookie, {
                 httpOnly: true,
                 maxAge: expiresIn,
                 sameSite: true,

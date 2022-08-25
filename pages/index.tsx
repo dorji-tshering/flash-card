@@ -58,7 +58,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
     }
 
     try {
-        const sessionCookie = cookie.parse(cookieObject).session;
+        const sessionCookie = cookie.parse(cookieObject).__session;
         const decodedClaims = await verifySessionCookie(sessionCookie, true);
         const uid = decodedClaims.uid;
         userId = uid;

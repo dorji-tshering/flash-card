@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server'
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
     // redirect to home if user session does note exist on '/category/*'
-    if(!request.cookies.get('session')) {
+    if(!request.cookies.get('__session')) {
         const url = request.nextUrl.clone();
         url.pathname = '/';
         return NextResponse.redirect(url);

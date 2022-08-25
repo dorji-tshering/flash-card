@@ -45,9 +45,11 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
         });
     }
 
+    console.log(cookie.parse(cookieObject)['__session']);
+
     // verify user session and get notes
     try {
-        const sessionCookie = cookie.parse(cookieObject).session;
+        const sessionCookie = cookie.parse(cookieObject)['__session'];
         const decodedClaims = await verifySessionCookie(sessionCookie, true);
         const uid = decodedClaims.uid;
         const collRef = collection(database, 'CategoryCollection', uid, ctx.params.id as string);
