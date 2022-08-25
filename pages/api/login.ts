@@ -14,7 +14,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             cookie.serialize("__session", sessionCookie, {
                 httpOnly: true,
                 maxAge: expiresIn,
-                sameSite: false,
+                sameSite: 'none',
                 secure: true,
                 path: "/",
             })

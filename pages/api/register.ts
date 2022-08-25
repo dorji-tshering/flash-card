@@ -14,9 +14,10 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             cookie.serialize("__session", sessionCookie, {
                 httpOnly: true,
                 maxAge: expiresIn,
-                sameSite: false,
+                sameSite: 'none',
                 secure: true,
                 path: "/",
+                domain: req.body.domain
             })
         );
     res.status(200).send(JSON.stringify({status: 'success'}));
