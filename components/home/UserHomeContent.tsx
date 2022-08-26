@@ -71,6 +71,12 @@ const Container = styled.div`
         }        
     }
 
+    .no-filter-notes {
+        text-align: center;
+        margin-top: 150px;
+        color: var(--secondary-text-color);
+    }
+
     .no-notes-content {
         text-align: center;
         margin-top: 100px;
@@ -110,7 +116,7 @@ const UserHomeContent = ({ notes, userId }: Props) => {
 
     return (
         <Container>
-            { filteredNotes.length !== 0 ? 
+            { oriNotes.length !== 0 ? 
                 <>
                     <div className="top-bar">
                         <h4 className="title">Your Cards: <span className="card-count">{filteredNotes.length}</span></h4>
@@ -128,7 +134,13 @@ const UserHomeContent = ({ notes, userId }: Props) => {
                         </div>
                     </div>
                     
-                    <NotesContainer notes={filteredNotes}/>
+                    { filteredNotes.length !== 0 ? 
+                        <NotesContainer notes={filteredNotes}/>
+                        :
+                        <div className="no-filter-notes">
+                            <p>You don't have notes for this filter.</p>
+                        </div>    
+                    }
                 </>
                 :
 

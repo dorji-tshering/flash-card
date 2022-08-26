@@ -178,7 +178,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
     },[]);
 
     // save card
-    const saveContent = (event: React.FormEvent) => {
+    const saveContent = async (event: React.FormEvent) => {
         event.preventDefault();
 
         if(!category) {
@@ -200,9 +200,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
         }
 
         setLoading(true);
-
         const categoryCollectionRef = collection(database, 'CategoryCollection', currentUser.uid, category );
-
         const cardData = {
             data: contentType === 'text' ? textContent : codeEditor.getValue(),
             category: category,
@@ -210,44 +208,30 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
             contentType : contentType,
             language: contentType === 'code' ? language : null,
             known: false
-        }
+        } 
 
         // create or update user document containing categroies field
         const docRef = doc(database, "CategoryCollection", currentUser.uid);
-        getDoc(docRef).then((doc) => {
-            if(doc.exists()) {
-                updateDoc(docRef, {
-                    categories: arrayUnion(category),
-                }).then(() => {
-                    if(!categories.includes(category)) {
-                        setCategories((categories: string[]) => [...categories, category]);
-                    }
-                }).catch((err) => {
-                    console.log(err.code); 
-                });
-            }else {
-                setDoc(docRef, {
-                    categories: [category]
-                }).then(() => {
-                    setCategories([category]);
-                }).catch((err) => {
-                    console.log(err.code);
-                });
+        const document = await getDoc(docRef);
+        if(document.exists()) {
+            await updateDoc(docRef, {
+                categories: arrayUnion(category),
+            });
+            if(!categories.includes(category)) {
+                setCategories((categories: string[]) => [...categories, category]);
             }
-        }).catch((err) => {
-            console.log(err.code);
-        });
+        }else {
+            await setDoc(docRef, {
+                categories: [category],
+            });
+            setCategories([category]);
+        }
 
-        // add notes under the specified category collection
-        addDoc(categoryCollectionRef, cardData).then((res) => {
-            setNotification('Card saved successfully.');
-            setLoading(false);
-            Router.replace(`/category/${category}`);
-        }).catch((err) => {
-            console.log(err);
-            setLoading(false);
-        });
-        
+        // add document for the particular category/collection
+        await addDoc(categoryCollectionRef, cardData);
+        setNotification('Card saved successfully.');
+        setLoading(false);
+        Router.replace(`/category/${category}`);
     }
 
     const updateCard = (event: React.FormEvent) => {

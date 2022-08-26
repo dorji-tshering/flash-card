@@ -1,6 +1,8 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { collection, CollectionReference, doc, DocumentData, getDoc, getDocs } from '@firebase/firestore';
 import cookie from 'cookie';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
 
 import CategoryContent from "../../components/category/CategoryContent";
 import Layout from "../../components/layout/Layout";
@@ -91,9 +93,14 @@ const CardCategory = ({ notes, noteCategories }) => {
     },[])
 
     return (
-        <Layout>
-            <CategoryContent notes={notes}/>
-        </Layout>
+        <>
+            <Head>
+                <title key='title'>{`FS: ${useRouter().query.id}`}</title>
+            </Head>
+            <Layout>
+                <CategoryContent notes={notes}/>
+            </Layout>
+        </>
     );
 }
 

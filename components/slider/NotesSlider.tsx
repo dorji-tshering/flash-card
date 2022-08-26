@@ -184,7 +184,7 @@ const Container = styled.div`
 
                     &.cancel {
                         background: none;
-                        border: 1px solid var(--primary-text-color);
+                        border: 1px solid var(--border-color);
                     }
 
                     &.delete-note {

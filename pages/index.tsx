@@ -5,6 +5,7 @@ import { verifySessionCookie } from '../firebaseAdmin';
 import { collection, DocumentData, DocumentReference, getDoc, getDocs } from '@firebase/firestore';
 import { database } from '../firebaseClient';
 import { doc } from 'firebase/firestore';
+import Head from 'next/head';
 
 import Layout from '../components/layout/Layout';
 import HomeContent from '../components/home/HomeContent';
@@ -95,8 +96,13 @@ export default function Home({ notes, userId, noteCategories }) {
     },[])
 
     return (
-        <Layout>
-            <HomeContent notes={notes} userId={userId}/>
-        </Layout>
+        <>
+            <Head>
+                <title key='title'>FS: Home</title>
+            </Head>
+            <Layout>
+                <HomeContent notes={notes} userId={userId}/>
+            </Layout>
+        </>
     );
 }
