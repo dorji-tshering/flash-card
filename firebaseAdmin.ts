@@ -1,8 +1,6 @@
 import admin from 'firebase-admin';
 import { SessionCookieOptions } from 'firebase-admin/lib/auth/base-auth';
 
-// get this JSON from the Firebase board
-// you can also store the values in environment variables
 const { privateKey } = JSON.parse(process.env.FIREBASE_PRIVATE_KEY);
 
 if(!admin.apps.length) {
