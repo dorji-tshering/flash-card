@@ -3,6 +3,7 @@ import { SessionCookieOptions } from 'firebase-admin/lib/auth/base-auth';
 
 // get this JSON from the Firebase board
 // you can also store the values in environment variables
+const { privateKey } = JSON.parse(process.env.FIREBASE_PRIVATE_KEY);
 
 if(!admin.apps.length) {
     admin.initializeApp({
@@ -10,7 +11,7 @@ if(!admin.apps.length) {
             projectId: process.env.FIREBASE_PROJECT_ID,
             clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
             // replace `\` and `n` character pairs w/ single `\n` character
-            privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined,
+            privateKey: privateKey
         }),
         databaseURL: process.env.DATABASE_URL,
     });
