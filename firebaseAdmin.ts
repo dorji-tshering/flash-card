@@ -10,7 +10,6 @@ if(!admin.apps.length) {
         credential : admin.credential.cert({
             projectId: process.env.FIREBASE_PROJECT_ID,
             clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            // replace `\` and `n` character pairs w/ single `\n` character
             privateKey: privateKey
         }),
         databaseURL: process.env.DATABASE_URL,
