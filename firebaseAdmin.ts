@@ -1,11 +1,9 @@
 import admin from 'firebase-admin';
 import { SessionCookieOptions } from 'firebase-admin/lib/auth/base-auth';
 
-const { serviceAccount } = JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIALS);
-
 if(!admin.apps.length) {
     admin.initializeApp({
-        credential : admin.credential.cert(serviceAccount),
+        credential : admin.credential.cert(JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIALS)),
         databaseURL: process.env.DATABASE_URL,
     });
 }
