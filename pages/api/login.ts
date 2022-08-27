@@ -19,7 +19,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
                 secure: true,
                 path: "/",
             }) 
-        );
+        ); 
     res.status(200).send(JSON.stringify({status: 'success'}));
     }).catch((err) => {
         res.json(err);
