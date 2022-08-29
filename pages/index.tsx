@@ -75,7 +75,7 @@ export default function Home({ userId, noteCategories }) {
     return (
         <>
             <Head>
-                <title key='title'>FS: Home</title>
+                <title key='title'>FC: Home</title>
             </Head>
             <Layout>
                 <HomeContent userId={userId}/>

@@ -76,7 +76,7 @@ const CardCategory = ({ noteCategories }) => {
     return (
         <>
             <Head>
-                <title key='title'>{`FS: ${useRouter().query.id}`}</title>
+                <title key='title'>{`FC: ${useRouter().query.id}`}</title>
             </Head>
             <Layout>
                 <CategoryContent/>
