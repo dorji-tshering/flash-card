@@ -13,48 +13,31 @@ import { useCategoryContext } from '../../components/utils/categoryContext';
 import { useEffect } from 'react';
 
 export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePropsContext) => {
-    let notes: Object[] = [];
     let noteCategories: string[] = [];
-
     const cookieObject: string = ctx.req.headers.cookie;
-    // return if no cookie found
+
     if(!cookieObject) {
         return { 
             props: {
-                notes: notes,
                 noteCategories: noteCategories,
             }
         }
     }
 
-    const getNotes = async (collRef: CollectionReference<DocumentData>, uid: string) => {
+    const getCategories = async (uid: string) => {
         const catSnapShot = await getDoc(doc(database, 'CategoryCollection', uid));
         if(catSnapShot.data().categories.length > 0) {
             noteCategories = catSnapShot.data().categories;
         }else {
             return;
         }
-
-        const snapShot = await getDocs(collRef);
-        if(!snapShot) {
-            return;
-        }
-
-        snapShot.docs.forEach((doc) => {
-            let docObject = doc.data();
-            docObject.docId = doc.id;
-            notes.push(docObject);
-        });
     }
 
-    // verify user session and get notes
     try {
         const sessionCookie = cookie.parse(cookieObject)['__session'];
         const decodedClaims = await verifySessionCookie(sessionCookie, true);
         const uid = decodedClaims.uid;
-        const collRef = collection(database, 'CategoryCollection', uid, ctx.params.id as string);
         const document = await getDoc(doc(database, 'CategoryCollection', uid));
-        // redirect for non-existent categories
         if(!document.data().categories.includes(ctx.params.id)) {
             return {
                 redirect: {
@@ -63,13 +46,12 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
                   }
             }
         }
-        await getNotes(collRef, uid);
+        await getCategories(uid);
 
     } catch(err) {
         console.log('Error: ' + err);
         return {
             props: {
-                notes: notes,
                 noteCategories: noteCategories,
             }
         }
@@ -77,13 +59,12 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
 
     return {
         props: {
-            notes: notes,
             noteCategories: noteCategories,
         }
     }
 }
 
-const CardCategory = ({ notes, noteCategories }) => {
+const CardCategory = ({ noteCategories }) => {
     const { categories, setCategories } = useCategoryContext();
 
     useEffect(() => {
@@ -91,14 +72,14 @@ const CardCategory = ({ notes, noteCategories }) => {
                 setCategories(noteCategories);
             }
     },[])
-
+ 
     return (
         <>
             <Head>
                 <title key='title'>{`FS: ${useRouter().query.id}`}</title>
             </Head>
             <Layout>
-                <CategoryContent notes={notes}/>
+                <CategoryContent/>
             </Layout>
         </>
     );

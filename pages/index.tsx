@@ -14,7 +14,6 @@ import { useEffect } from 'react';
 
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
     let userId: string = null;
-    let notes: Object[] = [];
     let noteCategories: string[] = [];
 
     const cookieObject: string = ctx.req.headers.cookie;
@@ -22,15 +21,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
     if(!cookieObject) {
         return { 
             props: {
-                notes: notes,
                 userId: userId,
                 noteCategories: noteCategories
             } 
         }
-    }
+    } 
 
-    const getNotes = async (categoryDocRef: DocumentReference<DocumentData>, uid: string) =>{
-        let tempNotes: DocumentData[] = [];
+    const getCategories = async (categoryDocRef: DocumentReference<DocumentData>) =>{
         const categoriesSnapshot = await getDoc<DocumentData>(categoryDocRef);
         const categoriesObject = categoriesSnapshot.data();
 
@@ -40,37 +37,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
         }else {
             noteCategories = categoriesObject.categories;
         }
-
-        const promises: [] = categoriesObject.categories.map((category: string) => {
-            const userCategoriesRef = collection(database, 'CategoryCollection', uid, category);
-            return getDocs(userCategoriesRef); // returns a promise
-        });   
-
-        const allQuerySnapshots = await Promise.all<DocumentData>(promises);
-        allQuerySnapshots.forEach((querySnapshot) => {
-            tempNotes.push(...querySnapshot.docs);
-        });
-
-        tempNotes.forEach((doc) => {
-            let docObject = doc.data();
-            docObject.docId = doc.id;
-            notes.push(docObject);
-        });
     }
 
     try {
         const sessionCookie = cookie.parse(cookieObject)['__session'];
         const decodedClaims = await verifySessionCookie(sessionCookie, true);
-        const uid = decodedClaims.uid;
-        userId = uid;
-        const categoryDocRef = doc(database, "CategoryCollection", uid);
-        await getNotes(categoryDocRef, uid);
+        userId = decodedClaims.uid;
+        const categoryDocRef = doc(database, "CategoryCollection", userId);
+        await getCategories(categoryDocRef);
 
     } catch(err) {
         console.log('Error: ' + err);
         return {
             props: {
-                notes: notes,
                 userId: userId,
                 noteCategories: noteCategories
             }
@@ -79,14 +58,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
 
     return {
         props: {
-            notes: notes,
             userId: userId,
             noteCategories: noteCategories
         }
     }
 }
 
-export default function Home({ notes, userId, noteCategories }) {
+export default function Home({ userId, noteCategories }) {
     const { categories, setCategories } = useCategoryContext();
 
     useEffect(() => {
@@ -101,7 +79,7 @@ export default function Home({ notes, userId, noteCategories }) {
                 <title key='title'>FS: Home</title>
             </Head>
             <Layout>
-                <HomeContent notes={notes} userId={userId}/>
+                <HomeContent userId={userId}/>
             </Layout>
         </>
     );

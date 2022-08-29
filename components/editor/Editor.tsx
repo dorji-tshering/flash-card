@@ -2,7 +2,7 @@ import { useEffect, useState, createContext } from 'react';
 import Router from 'next/router';
 import styled from 'styled-components';
 import { RiArrowDownSLine } from 'react-icons/ri';
-import { collection, addDoc, doc, getDoc, setDoc, arrayUnion, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, setDoc, arrayUnion, updateDoc, DocumentData } from 'firebase/firestore';
 
 import ace from 'ace-builds/src-noconflict/ace';
 import monokai from 'ace-builds/src-noconflict/theme-monokai';
@@ -118,7 +118,7 @@ interface Props {
     contentType: string
     language: string
     forEdit?: boolean,
-    note?: any
+    note?: DocumentData
 }
 
 const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) => {
@@ -236,12 +236,12 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
 
     const updateCard = (event: React.FormEvent) => {
         event.preventDefault();
-        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.category, note.docId);
+        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.id);
         setLoading(true);
         updateDoc(docRef, {
             data: contentType === 'text' ? textContent : codeEditor.getValue(),
         }).then(() => {
-            note.data = contentType === 'text' ? textContent : codeEditor.getValue();
+            note.data().data = contentType === 'text' ? textContent : codeEditor.getValue();
             setDoneEditing(true);
             setLoading(false);
             setNotification('Card updated successfully.');
@@ -267,11 +267,11 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
                 }
 
                 { showCategory ? 
-                <SelectCategory 
-                    goBack={() => setShowCategory(false)}
-                    setCategory={setCategory}
-                    category={category}
-                /> : ''}
+                    <SelectCategory 
+                        goBack={() => setShowCategory(false)}
+                        setCategory={setCategory}
+                        category={category}
+                    /> : ''}
 
                 <div className="form-wrapper">
                     <form onSubmit={forEdit ? updateCard : saveContent}>
@@ -282,7 +282,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
                                     onChange={(e) => setTextContent(e.target.value)} 
                                     className="text-area" 
                                     placeholder="Enter your text..."
-                                    defaultValue={note?.data}>
+                                    defaultValue={note.data().data}>
                                 </textarea>
                                 :
                                 <div id="code-editor"></div>

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { RiEyeLine } from 'react-icons/ri';
+import { DocumentData } from '@firebase/firestore';
 
 import RenderCode from '../renderCode/RenderCode';
 import { useSliderContextValue } from '../utils/sliderContext';
@@ -99,7 +100,7 @@ const GridElement = styled.div`
 `;
 
 interface Props { 
-    notes: any[]
+    notes: DocumentData[]
 }
 
 const NotesContainer = ({ notes }: Props) => {
@@ -118,17 +119,17 @@ const NotesContainer = ({ notes }: Props) => {
 
     return (
         <GridContainer>
-            { notes.map((note, idx) => {
+            { notes.map((note: DocumentData, idx: number) => {
                 return (
                     <GridElement key={idx}>
-                        { note.contentType === 'code' ? 
-                            <div className="wrapper-content"><RenderCode language={note.language} code={note.data} /></div>
+                        { note.data().contentType === 'code' ? 
+                            <div className="wrapper-content"><RenderCode language={note.data().language} code={note.data().data} /></div>
                             :
-                            <div className="wrapper-content"><p>{ note.data }</p></div>
+                            <div className="wrapper-content"><p>{ note.data().data }</p></div>
                         }
                         <p className="meta">
-                            <span className="category">{ note.category }</span>
-                            <span className="content-type">{ note.contentType }</span>
+                            <span className="category">{ note.data().category }</span>
+                            <span className="content-type">{ note.data().contentType }</span>
                             <span onClick={() => openSlider(note)} className="view-note"><RiEyeLine/></span>
                         </p>                                  
                     </GridElement>

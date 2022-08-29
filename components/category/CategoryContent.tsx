@@ -1,4 +1,4 @@
-import { arrayRemove, doc, updateDoc } from '@firebase/firestore';
+import { arrayRemove, collection, doc, DocumentData, getDocs, updateDoc } from '@firebase/firestore';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { database } from '../../firebaseClient';
@@ -6,7 +6,7 @@ import NotesContainer from '../containers/NotesContainer';
 import { useAuthValue } from '../utils/authContext';
 import { useCategoryContext } from '../utils/categoryContext';
 import Loader from '../loader/Loader';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const Container = styled.div`
     height: 100%;
@@ -49,14 +49,27 @@ const Container = styled.div`
     @media screen and (max-width: 480px) {
         padding: 30px 10px;
     } 
-`;
+`; 
 
-const CategoryContent = ({ notes }) => {
-    const [loading, setLoading] = useState<boolean>(false);
+const CategoryContent = () => {
+    const [notes, setNotes] = useState<Array<DocumentData>>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     const { categories, setCategories } = useCategoryContext();
     const { currentUser } = useAuthValue();
     const category = useRouter().query.id as string;
     const router = useRouter();
+
+    // fetch notes specific to the category
+    useEffect(() => {
+        const getCategories = async () => {
+            const collRef = collection(database, 'CategoryCollection', currentUser.uid, category);
+            const snapShot = await getDocs(collRef);
+            setNotes([...snapShot.docs]);
+        }
+        getCategories();
+        setLoading(false);
+    },[]);
+
 
     const deleteCategory = async () => {
         const docRef = doc(database, 'CategoryCollection', currentUser.uid);
@@ -77,21 +90,23 @@ const CategoryContent = ({ notes }) => {
 
     return (
         <Container>
-            { loading ? <Loader background="transparent"/> : ''}
-            { notes.length > 0 ? 
-                <div className="notes-wrapper">
-                    <div className="top">
-                        <h4>My {category} Notes</h4>
+            
+            { loading ? <Loader background/> 
+                :
+                notes.length > 0 ? 
+                    <div className="notes-wrapper">
+                        <div className="top">
+                            <h4>My {category} Notes</h4>
+                        </div>
+                        <NotesContainer notes={notes}/>
                     </div>
-                    <NotesContainer notes={notes}/>
-                </div>
-                : 
-                <div className="no-notes-wrapper">
-                    <p>You don't have any notes for this category.</p>
-                    <div className="action">
-                        <button onClick={deleteCategory} className="secondary-button">Delete Category</button>
+                    : 
+                    <div className="no-notes-wrapper">
+                        <p>You don't have any notes for this category.</p>
+                        <div className="action">
+                            <button onClick={deleteCategory} className="secondary-button">Delete Category</button>
+                        </div>
                     </div>
-                </div>
             }
         </Container>
     );

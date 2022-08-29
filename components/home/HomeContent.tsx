@@ -11,16 +11,15 @@ const Container = styled.div`
 `;
 
 interface Props {
-    notes: any[],
     userId: string
 }
 
-const HomeContent = ({ notes, userId }: Props) => {
+const HomeContent = ({ userId }: Props) => {
 
     return (
             <Container>
                 { userId ?
-                    <UserHomeContent notes={notes} userId={userId}/>
+                    <UserHomeContent/>
                     :
                     <GuestHomeContent/>
                 }

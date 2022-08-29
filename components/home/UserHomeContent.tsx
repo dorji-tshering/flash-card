@@ -1,9 +1,15 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BiFilter } from 'react-icons/bi';
 import { GiNotebook } from 'react-icons/gi'
 
 import NotesContainer from '../containers/NotesContainer';
+import { useAuthValue } from '../utils/authContext';
+import { useCategoryContext } from '../utils/categoryContext';
+import { database } from '../../firebaseClient';
+import { doc } from '@firebase/firestore';
+import { collection, DocumentData, getDocs } from 'firebase/firestore';
+import Loader from '../loader/Loader';
 
 
 const Container = styled.div`
@@ -91,16 +97,41 @@ const Container = styled.div`
         padding: 30px 10px;
     } 
 `; 
-
-interface Props {
-    notes: any;
-    userId: string;
-}
-
-const UserHomeContent = ({ notes, userId }: Props) => {
-    const [oriNotes, setOriNotes] = useState(notes);
-    const [filteredNotes, setFilteredNotes] = useState(notes);
+ 
+const UserHomeContent = () => {
+    const [oriNotes, setOriNotes] = useState<Array<DocumentData>>([]);
+    const [filteredNotes, setFilteredNotes] = useState<Array<DocumentData>>([]);
     const [showFilter, setShowFilter] = useState<boolean>(false);
+    const [loading, setLoading] = useState(true);
+
+    const { currentUser } = useAuthValue();
+    const { categories } = useCategoryContext();
+
+    // fetch notes for the userId
+    useEffect(() => {
+        const getNotes = async () =>{
+            let tempNotes: DocumentData[] = [];
+    
+            const promises: [] = categories.map((category: string) => {
+                const userCategoriesRef = collection(database, 'CategoryCollection', currentUser.uid, category);
+                return getDocs(userCategoriesRef); // returns a promise
+            });   
+    
+            const allQuerySnapshots = await Promise.all<DocumentData>(promises);
+            allQuerySnapshots.forEach((querySnapshot) => {
+                tempNotes.push(...querySnapshot.docs);
+            });
+            
+            setOriNotes(tempNotes);
+            setFilteredNotes(tempNotes);
+            setLoading(false);
+        }
+
+        getNotes();
+    }, [categories])
+
+
+
 
     // filter function for notes 
     const filterNotes = (filter: string) => {
@@ -116,38 +147,41 @@ const UserHomeContent = ({ notes, userId }: Props) => {
 
     return (
         <Container>
-            { oriNotes.length !== 0 ? 
-                <>
-                    <div className="top-bar">
-                        <h4 className="title">Your Cards: <span className="card-count">{filteredNotes.length}</span></h4>
-                        <div className="filter-wrapper">
-                            <button onClick={() => setShowFilter(!showFilter)} className="toggle-filter"><BiFilter size={22}/></button>
-                            { showFilter ? 
-                                <div className="filter-options">
-                                    <span onClick={() => filterNotes('default')} className="filter">Default</span>
-                                    <span onClick={() => filterNotes('known')} className="filter">Known</span>
-                                    <span onClick={() => filterNotes('unknown')} className="filter">Unknown</span>
-                                </div>
-                                :
-                                ''
-                            }
-                        </div>
-                    </div>
-                    
-                    { filteredNotes.length !== 0 ? 
-                        <NotesContainer notes={filteredNotes}/>
-                        :
-                        <div className="no-filter-notes">
-                            <p>You don't have notes for this filter.</p>
-                        </div>    
-                    }
-                </>
+            { loading ? 
+                <Loader background/>
                 :
-
-                <div className="no-notes-content">
-                    <p className="icon"><GiNotebook size={50}/></p>
-                    <p>Looks like you don't have any notes for now. Start creating one.</p>
-                </div>
+                oriNotes.length !== 0 ? 
+                    <>
+                        <div className="top-bar">
+                            <h4 className="title">Your Cards: <span className="card-count">{filteredNotes.length}</span></h4>
+                            <div className="filter-wrapper">
+                                <button onClick={() => setShowFilter(!showFilter)} className="toggle-filter"><BiFilter size={22}/></button>
+                                { showFilter ? 
+                                    <div className="filter-options">
+                                        <span onClick={() => filterNotes('default')} className="filter">Default</span>
+                                        <span onClick={() => filterNotes('known')} className="filter">Known</span>
+                                        <span onClick={() => filterNotes('unknown')} className="filter">Unknown</span>
+                                    </div>
+                                    :
+                                    ''
+                                }
+                            </div>
+                        </div>
+                        
+                        { filteredNotes.length !== 0 ? 
+                            <NotesContainer notes={filteredNotes}/>
+                            :
+                            <div className="no-filter-notes">
+                                <p>You don't have notes for this filter.</p>
+                            </div>    
+                        }
+                    </>
+                    :
+    
+                    <div className="no-notes-content">
+                        <p className="icon"><GiNotebook size={50}/></p>
+                        <p>Looks like you don't have any notes for now. Start creating one.</p>
+                    </div>
             }
         </Container>
     )

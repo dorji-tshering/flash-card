@@ -270,7 +270,7 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
         if(activeIdx + 1 === notes.length) {
             setActiveIdx(0);
         }else {
-            setActiveIdx(activeIdx + 1)
+            setActiveIdx(activeIdx + 1);
         }
         setLoading(false);
     }
@@ -287,11 +287,11 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
 
     const toggleKnown = (note: any) => {
         setLoading(true);
-        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.category, note.docId);
+        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.data().docId);
         updateDoc(docRef, {
-            known: !notes[activeIdx].known,
+            known: !notes[activeIdx].data().known,
         }).then(() => {
-            note.known = !notes[activeIdx].known;
+            note.known = !notes[activeIdx].data().known;
             setNotification('Toggle successfully updated.');
             setLoading(false);
         }).catch((err) => {
@@ -302,7 +302,7 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
 
     const deleteNote = (note: any) => {
         setLoading(true);
-        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.category, note.docId);
+        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.id);
         deleteDoc(docRef).then(() => {
             notes.splice(notes.indexOf(note), 1);
             if(activeIdx === 0) {
@@ -361,20 +361,20 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
                 <div className="note-wrapper flex">
                     <div className="note-meta flex">
                         <span className="category flex center-content">
-                            <BsDot size={28} color="#FEAE12" className="icon"/>{ notes[activeIdx].category }
+                            <BsDot size={28} color="#FEAE12" className="icon"/>{ notes[activeIdx].data().category }
                         </span>
                         <span className="counter">{activeIdx + 1} of {notes.length}</span>
                         <span className="content-type flex center-content">
-                            <BsDot color="#e91e63" size={28} className="icon"/>{ notes[activeIdx].contentType }
+                            <BsDot color="#e91e63" size={28} className="icon"/>{ notes[activeIdx].data().contentType }
                         </span>
                     </div>
                     <div className="note-content">
-                        { notes[activeIdx].contentType === 'text' ?
-                            <p className="note">{notes[activeIdx].data}</p>
+                        { notes[activeIdx].data().contentType === 'text' ?
+                            <p className="note">{notes[activeIdx].data().data}</p>
                             :
                             <RenderCode 
-                                code={notes[activeIdx].data}
-                                language={notes[activeIdx].language}
+                                code={notes[activeIdx].data().data}
+                                language={notes[activeIdx].data().language}
                             />
                         }
                     </div>
@@ -383,9 +383,9 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
                             <MdModeEdit className="icon"/>
                             <span>Edit</span>
                         </button>
-                        <button onClick={() => toggleKnown(notes[activeIdx])} className={`toggle-known flex center-content ${notes[activeIdx].known ? 'known' : ''}`}>
+                        <button onClick={() => toggleKnown(notes[activeIdx])} className={`toggle-known flex center-content ${notes[activeIdx].data().known ? 'known' : ''}`}>
                             <span>Known</span>
-                            { notes[activeIdx].known ?                            
+                            { notes[activeIdx].data().known ?                            
                                 <BsToggle2On size={22} color="#0175FF" className="icon on"/>                          
                                 :                        
                                 <BsToggle2Off size={22} className="icon off"/>
