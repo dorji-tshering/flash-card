@@ -71,6 +71,9 @@ const Container  = styled.div`
         top: -50px;
         width: 100%;
         z-index: 10;
+        bottom: 0;
+        margin: auto;
+        height: fit-content;
    }
 
    .editor {
@@ -139,7 +142,6 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
     }
 
     const { currentUser } = useAuthValue();
-
     // set up ace code editor 
     useEffect(() => {
         // only if the contentType is code 
@@ -148,7 +150,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
             editor = ace.edit('code-editor');
             editor.setTheme(monokai);
             if(forEdit) {
-                editor.setValue(note.data);
+                editor.setValue(note.data().data);
             }
             editor.setOptions({
                 useWorker: false,
@@ -170,8 +172,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
                     break;
                 default:
                     editor.session.setMode("ace/mode/css");
-                    break;
-                
+                    break;    
             }
         }
         setCodeEditor(editor);
@@ -236,6 +237,19 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
 
     const updateCard = (event: React.FormEvent) => {
         event.preventDefault();
+        // check for any non-space characters or empty string
+        if(contentType === 'text') {
+            if (!/\S/.test(textContent) || !textContent) {
+                alert('Your text note is empty');
+                return;
+            }
+        } else if(contentType === 'code') {
+            if(!/\S/.test(codeEditor.getValue())) {
+                alert('Your code note is empty');
+                return;
+            }
+        }
+
         const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.id);
         setLoading(true);
         updateDoc(docRef, {
@@ -244,7 +258,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
             note.data().data = contentType === 'text' ? textContent : codeEditor.getValue();
             setDoneEditing(true);
             setLoading(false);
-            setNotification('Card updated successfully.');
+            setNotification('Card updated successfully. Changes will appear after the slider is closed.');
         }).catch(err => {
             console.log(err.code);
             setLoading(false);
@@ -282,7 +296,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
                                     onChange={(e) => setTextContent(e.target.value)} 
                                     className="text-area" 
                                     placeholder="Enter your text..."
-                                    defaultValue={note.data().data}>
+                                    defaultValue={note?.data().data}>
                                 </textarea>
                                 :
                                 <div id="code-editor"></div>

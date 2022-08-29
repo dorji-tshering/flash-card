@@ -2,7 +2,7 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import cookie from 'cookie';
 import { verifySessionCookie } from '../firebaseAdmin';
-import { collection, DocumentData, DocumentReference, getDoc, getDocs } from '@firebase/firestore';
+import { DocumentData, DocumentReference, getDoc, getDocs } from '@firebase/firestore';
 import { database } from '../firebaseClient';
 import { doc } from 'firebase/firestore';
 import Head from 'next/head';
@@ -15,7 +15,7 @@ import { useEffect } from 'react';
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
     let userId: string = null;
     let noteCategories: string[] = [];
-
+ 
     const cookieObject: string = ctx.req.headers.cookie;
     // return if no cookie found
     if(!cookieObject) {
@@ -37,7 +37,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
         }else {
             noteCategories = categoriesObject.categories;
         }
-    }
+    } 
 
     try {
         const sessionCookie = cookie.parse(cookieObject)['__session'];
@@ -45,13 +45,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
         userId = decodedClaims.uid;
         const categoryDocRef = doc(database, "CategoryCollection", userId);
         await getCategories(categoryDocRef);
-
     } catch(err) {
-        console.log('Error: ' + err);
+        console.log(err);
         return {
             props: {
-                userId: userId,
-                noteCategories: noteCategories
+                userId: null,
+                noteCategories: []
             }
         }
     }
@@ -62,7 +61,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
             noteCategories: noteCategories
         }
     }
-}
+} 
 
 export default function Home({ userId, noteCategories }) {
     const { categories, setCategories } = useCategoryContext();

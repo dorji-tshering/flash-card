@@ -31,7 +31,7 @@ const GridElement = styled.div`
     justify-content: space-between;
     border-radius: 5px;
     padding: 15px;
-    box-shadow: rgb(0 0 0 / 12%) 0px 2px 3px, rgb(0 0 0 / 24%) 0px 1px 50px;
+    border: 1px solid var(--border-color);
 
     .wrapper-content {
         overflow: auto;

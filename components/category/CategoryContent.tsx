@@ -1,12 +1,14 @@
 import { arrayRemove, collection, doc, DocumentData, getDocs, updateDoc } from '@firebase/firestore';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
+
 import { database } from '../../firebaseClient';
 import NotesContainer from '../containers/NotesContainer';
 import { useAuthValue } from '../utils/authContext';
 import { useCategoryContext } from '../utils/categoryContext';
 import Loader from '../loader/Loader';
-import { useEffect, useState } from 'react';
+import { useRenderContext } from '../utils/renderContext';
 
 const Container = styled.div`
     height: 100%;
@@ -58,17 +60,19 @@ const CategoryContent = () => {
     const { currentUser } = useAuthValue();
     const category = useRouter().query.id as string;
     const router = useRouter();
-
-    // fetch notes specific to the category
+    const { render } = useRenderContext();
+ 
     useEffect(() => {
         const getCategories = async () => {
             const collRef = collection(database, 'CategoryCollection', currentUser.uid, category);
             const snapShot = await getDocs(collRef);
             setNotes([...snapShot.docs]);
+            setLoading(false);
         }
-        getCategories();
-        setLoading(false);
-    },[]);
+        if(currentUser) {
+            getCategories();
+        }
+    },[currentUser, render]);
 
 
     const deleteCategory = async () => {
@@ -91,9 +95,10 @@ const CategoryContent = () => {
     return (
         <Container>
             
-            { loading ? <Loader background/> 
+            { loading ? 
+                <Loader background="var(--main-background-color)"/> 
                 :
-                notes.length > 0 ? 
+                notes.length !== 0 ? 
                     <div className="notes-wrapper">
                         <div className="top">
                             <h4>My {category} Notes</h4>

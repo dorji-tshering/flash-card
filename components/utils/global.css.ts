@@ -13,7 +13,7 @@ export default createGlobalStyle`
         --yellow-color: #FEAE12;
         --red-color: #e91e63;
         --green-color: #388E3C;
-        --fs-button-padding: 10px 20px;
+        --fc-button-padding: 10px 20px;
         --action-hover-box-shadow: rgb(0 0 0) 0px 1px 2px 0px, rgb(52 55 56) 0px 1px 3px 1px;
     }
 
@@ -30,11 +30,11 @@ export default createGlobalStyle`
         color: var(--primary-text-color);
     }
 
-    button {
+    button, .button {
         border: none;
         cursor: pointer;
         user-select: none;
-        padding: var(--fs-button-padding);
+        padding: var(--fc-button-padding);
         border-radius: 5px;
         min-width: 100px;
 

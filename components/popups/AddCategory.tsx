@@ -18,7 +18,6 @@ const Container = styled.div`
     border: 1px solid var(--border-color);
 
     .add-category-form {
-        margin-top: 20px;
 
         input {
             width: 200px;

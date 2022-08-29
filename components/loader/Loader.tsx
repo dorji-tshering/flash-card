@@ -15,7 +15,7 @@ const Container = styled.div<Props>`
     left: 0;
     right: 0;
     bottom: 0;
-    background: ${props => props.background === "transparent" ? 'transparent' : 'var(--dark-background-color)'};
+    background: ${props => props.background};
     z-index: 9999;
 
     .lds-ring {

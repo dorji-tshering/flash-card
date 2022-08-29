@@ -28,10 +28,8 @@ const Container = styled.div`
     z-index: 10;
 
     .category-wrapper {
-        margin-top: -50px;
 
         h4 {
-            margin-top: 30;
             text-align: center;
         }
 

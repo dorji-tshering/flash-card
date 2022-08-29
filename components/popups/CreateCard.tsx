@@ -66,7 +66,7 @@ const CreateCard = ({ setCreateCard }) => {
     const [language, setLanguage] = useState<string>(null);
     const [selectLanguage, setSelectLanguage] = useState<boolean>(false);
     const nextButtonRef = useRef<HTMLButtonElement>(null);
-        
+         
     const setContentEditor = (event: React.MouseEvent<HTMLButtonElement>, type: string) => {
         if(type === 'text') {
             setEditor('text');

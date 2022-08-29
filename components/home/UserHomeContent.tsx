@@ -1,15 +1,15 @@
 import styled from 'styled-components';
 import React, { useEffect, useState } from 'react';
 import { BiFilter } from 'react-icons/bi';
-import { GiNotebook } from 'react-icons/gi'
+import { GiNotebook } from 'react-icons/gi';
 
 import NotesContainer from '../containers/NotesContainer';
 import { useAuthValue } from '../utils/authContext';
 import { useCategoryContext } from '../utils/categoryContext';
 import { database } from '../../firebaseClient';
-import { doc } from '@firebase/firestore';
-import { collection, DocumentData, getDocs } from 'firebase/firestore';
+import { collection, DocumentData, getDocs, onSnapshot, query } from 'firebase/firestore';
 import Loader from '../loader/Loader';
+import { useRenderContext } from '../utils/renderContext';
 
 
 const Container = styled.div`
@@ -97,19 +97,20 @@ const Container = styled.div`
         padding: 30px 10px;
     } 
 `; 
- 
+
 const UserHomeContent = () => {
     const [oriNotes, setOriNotes] = useState<Array<DocumentData>>([]);
     const [filteredNotes, setFilteredNotes] = useState<Array<DocumentData>>([]);
     const [showFilter, setShowFilter] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
-
     const { currentUser } = useAuthValue();
     const { categories } = useCategoryContext();
+    const { render } = useRenderContext();
 
     // fetch notes for the userId
     useEffect(() => {
         const getNotes = async () =>{
+            setLoading(true);
             let tempNotes: DocumentData[] = [];
     
             const promises: [] = categories.map((category: string) => {
@@ -120,35 +121,36 @@ const UserHomeContent = () => {
             const allQuerySnapshots = await Promise.all<DocumentData>(promises);
             allQuerySnapshots.forEach((querySnapshot) => {
                 tempNotes.push(...querySnapshot.docs);
-            });
+            }); 
             
             setOriNotes(tempNotes);
             setFilteredNotes(tempNotes);
             setLoading(false);
         }
 
-        getNotes();
-    }, [categories])
-
-
-
+        if(currentUser) {
+            getNotes();
+        }
+    }, [categories, currentUser, render]);
 
     // filter function for notes 
     const filterNotes = (filter: string) => {
+        setLoading(true);
         if(filter === 'default') {
             setFilteredNotes(oriNotes);
         } else if (filter === 'known') {
-            setFilteredNotes(oriNotes.filter((note) => note.known === true));
+            setFilteredNotes(oriNotes.filter((note) => note.data().known === true));
         } else if(filter === 'unknown') {
-            setFilteredNotes(oriNotes.filter((note) => note.known === false));
+            setFilteredNotes(oriNotes.filter((note) => note.data().known === false));
         }
         setShowFilter(false);
+        setLoading(false);
     }
 
     return (
         <Container>
             { loading ? 
-                <Loader background/>
+                <Loader background="var(--main-background-color)"/>
                 :
                 oriNotes.length !== 0 ? 
                     <>
@@ -177,7 +179,6 @@ const UserHomeContent = () => {
                         }
                     </>
                     :
-    
                     <div className="no-notes-content">
                         <p className="icon"><GiNotebook size={50}/></p>
                         <p>Looks like you don't have any notes for now. Start creating one.</p>

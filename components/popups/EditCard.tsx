@@ -26,7 +26,7 @@ const Container = styled.div`
 `;
 
 interface Props {
-    note: any,
+    note: DocumentData,
     goBack: Dispatch<SetStateAction<boolean>>
 }
 
@@ -37,8 +37,8 @@ const EditCard = ({ note, goBack }: Props) => {
             <div className="wrapper">
                 <DynamicEditor 
                     goBack={goBack} 
-                    contentType={note.contentType} 
-                    language={note.language}
+                    contentType={note.data().contentType} 
+                    language={note.data().language}
                     forEdit={true}
                     note={note}
                 />

@@ -6,7 +6,6 @@ import { createSessionCookie } from '../../firebaseAdmin';
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const idToken = req.body.idToken.toString();
     const expiresIn = 60 * 60 * 24 * 5 * 1000;
-
     
     createSessionCookie(idToken, {
         expiresIn: expiresIn

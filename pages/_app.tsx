@@ -19,6 +19,8 @@ function MyApp({ Component, pageProps }) {
 		onAuthStateChanged(auth, (user) => {
 			if(user) {
 				setCurrentUser(user);
+			}else {
+				setCurrentUser(null);
 			} 
 		});
 	},[]);
@@ -42,7 +44,7 @@ function MyApp({ Component, pageProps }) {
 			</Head>
 		  	<GlobalStyle/>
 		  	{ 
-			  	loading ? <Loader background/>
+			  	loading ? <Loader background="var(--dark-background-color)"/>
 				:
 				<>
 				<AuthProvider value={{

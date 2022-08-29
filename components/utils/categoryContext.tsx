@@ -3,7 +3,7 @@ import { createContext, Dispatch, SetStateAction, useContext } from 'react';
 const CategoryContext = createContext(null);
 
 interface Props {
-    children: React.ReactNode,
+    children: React.ReactNode, 
     value: {
         categories: string[],
         setCategories: Dispatch<SetStateAction<string[]>>

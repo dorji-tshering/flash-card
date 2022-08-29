@@ -13,6 +13,7 @@ import { useAuthValue } from '../utils/authContext';
 import { database } from '../../firebaseClient';
 import Success from '../notice/Success';
 import Loader from '../loader/Loader'; 
+import { useRenderContext } from '../utils/renderContext';
 
 const Container = styled.div`
     position: absolute;
@@ -23,7 +24,7 @@ const Container = styled.div`
     height: 100%;
     top: 0;
     right: 0;
-    background: var(--light-background-color);
+    background: var(--main-background-color);
     z-index: 99;
 
     .flex {
@@ -99,11 +100,11 @@ const Container = styled.div`
                     .icon {
                         margin-right: 4px;
                     }
-                }
 
-                .edit:hover {
-                    color: var(--theme-color);
-                    border-color: var(--theme-color);
+                    &:hover {
+                        border: 1px solid var(--border-color);
+                        color: var(--primary-text-color);
+                    }
                 }
 
                 .toggle-known {
@@ -111,17 +112,12 @@ const Container = styled.div`
                     font-weight: 600;
 
                     &.known {
-                        color: var(--theme-color);
+                        color: #3b92fa;
                     }
 
                     .icon {
                         margin-left: 5px;
                     }
-                }
-
-                .delete:hover {
-                    color: var(--red-color);
-                    border-color: var(--red-color);
                 }
             }
         }
@@ -146,7 +142,6 @@ const Container = styled.div`
             background: var(--light-background-color);
             color: var(--primary-text-color);
             box-shadow: var(--action-hover-box-shadow);
-            transition: all .5s;
         }
     }
 
@@ -159,8 +154,8 @@ const Container = styled.div`
         border-radius: 50%;
 
         &:hover {
-            transition: all .5s;
             box-shadow: var(--action-hover-box-shadow);
+            background: var(--light-background-color);
         }
     }
 
@@ -264,6 +259,7 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const { setShowSlider } = useSliderContextValue();
     const { currentUser } = useAuthValue();
+    const { render, toggleRender } = useRenderContext();
 
     const nextNote = () => {
         setLoading(true);
@@ -285,14 +281,14 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
         setLoading(false);
     }
 
-    const toggleKnown = (note: any) => {
+    const toggleKnown = (note: DocumentData) => {
         setLoading(true);
-        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.data().docId);
+        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.id);
         updateDoc(docRef, {
-            known: !notes[activeIdx].data().known,
+            known: !note.data().known,
         }).then(() => {
-            note.known = !notes[activeIdx].data().known;
-            setNotification('Toggle successfully updated.');
+            note.data().known = !note.data().known;
+            setNotification('Update successfull. Changes will appear after the slider is closed.');
             setLoading(false);
         }).catch((err) => {
             console.log(err.code);
@@ -300,21 +296,22 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
         });
     }
 
-    const deleteNote = (note: any) => {
+    const deleteNote = (note: DocumentData) => {
         setLoading(true);
         const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.id);
         deleteDoc(docRef).then(() => {
             notes.splice(notes.indexOf(note), 1);
+            if(notes.length === 0) {
+                setLoading(false);
+                Router.replace(Router.asPath);
+            };
+
             if(activeIdx === 0) {
                 setActiveIdx(notes.length -1);
             }else {
                 setActiveIdx(activeIdx - 1);
             }
-            
-            if(notes.length === 0) {
-                setLoading(false);
-                Router.replace(Router.asPath);
-            };
+
             setLoading(false);
             setNotification('Your note is deleted.')
             showConfirmDelete(false);
@@ -344,7 +341,7 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
                 ''
             }
 
-            <span onClick={() => setShowSlider(false)} className="close-slider flex center-content">
+            <span onClick={() => {setShowSlider(false); toggleRender(!render)}} className="close-slider flex center-content">
                 <IoCloseSharp size={30}/>
             </span>
             <div className="left flex center-content">
@@ -386,7 +383,7 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
                         <button onClick={() => toggleKnown(notes[activeIdx])} className={`toggle-known flex center-content ${notes[activeIdx].data().known ? 'known' : ''}`}>
                             <span>Known</span>
                             { notes[activeIdx].data().known ?                            
-                                <BsToggle2On size={22} color="#0175FF" className="icon on"/>                          
+                                <BsToggle2On size={22} color="#3b92fa" className="icon on"/>                          
                                 :                        
                                 <BsToggle2Off size={22} className="icon off"/>
                             }

@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { DocumentData } from '@firebase/firestore';
+import styled from 'styled-components';
 
 import DesktopHeader from '../header/DesktopHeader';
 import MobileHeader from '../header/MobileHeader';
 import Footer from '../footer/Footer';
-import styled from 'styled-components';
 import useMediaQuery from '../utils/useMediaQuery';
 import MobileMenu from '../menu/MobileMenu';
 import LoginRegister from '../login/LoginRegister';
 import CreateCard from '../popups/CreateCard';
 import NotesSlider from '../slider/NotesSlider';
 import { SliderProvider } from '../utils/sliderContext';
+import { RenderContextProvider } from '../utils/renderContext';
 
 
 
@@ -39,6 +40,7 @@ const Layout = ({ children }: childType) => {
     const [createCard, setCreateCard] = useState<boolean>(false);
     const [showSlider, setShowSlider] = useState<boolean>(false);
     const [sliderData, setSliderData] = useState<{notes: DocumentData[], currentNote: DocumentData}>(null);
+    const [render, toggleRender] = useState<boolean>(false);
  
     const mobileDevice = useMediaQuery('991');
 
@@ -48,15 +50,22 @@ const Layout = ({ children }: childType) => {
         setSliderData: setSliderData
     }
 
+    const renderContextValue = {
+        render,
+        toggleRender
+    }
+
     return (
         <Container className="main-entry">
             { showSlider ? 
-                <SliderProvider value={sliderContextValue}>
-                    <NotesSlider
-                        notes={sliderData.notes}
-                        currentNote={sliderData.currentNote}
-                    />
-                </SliderProvider>
+                <RenderContextProvider value={renderContextValue}>
+                    <SliderProvider value={sliderContextValue}>
+                        <NotesSlider
+                            notes={sliderData.notes}
+                            currentNote={sliderData.currentNote}
+                        />
+                    </SliderProvider>
+                </RenderContextProvider>
                 : 
                 '' 
             }
@@ -80,9 +89,11 @@ const Layout = ({ children }: childType) => {
                 /> 
             }
 
-            <SliderProvider value={sliderContextValue}>
-                <main className='main-content'>{ children }</main>
-            </SliderProvider>
+            <RenderContextProvider value={renderContextValue}>
+                <SliderProvider value={sliderContextValue}>
+                    <main className='main-content'>{ children }</main>
+                </SliderProvider>
+            </RenderContextProvider>
 
             <Footer/>
         </Container>

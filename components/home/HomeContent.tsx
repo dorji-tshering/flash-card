@@ -15,7 +15,7 @@ interface Props {
 }
 
 const HomeContent = ({ userId }: Props) => {
-
+console.log(userId);
     return (
             <Container>
                 { userId ?
