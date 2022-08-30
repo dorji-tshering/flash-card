@@ -39,7 +39,7 @@ const Footer = () => {
         <p className="made-with"><span>Made with</span> 
             <FaHeart size='16' fill='#F70EE9'/>
         </p>
-        <p className="built-with">Built with <a href='https://nextjs.org/' className="next">NextJs</a> and <a href='https://firebase.google.com/' className="firebase">Firebase</a>
+        <p className="built-with">Built with <a href='https://nextjs.org/' className="next" target='_blank'>NextJs</a> and <a href='https://firebase.google.com/' className="firebase" target="_blank">Firebase</a>
         </p>
     </Container>
   )
