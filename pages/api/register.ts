@@ -14,15 +14,17 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             cookie.serialize("__session", sessionCookie, {
                 httpOnly: true,
                 maxAge: expiresIn,
-                sameSite: 'none',
+                sameSite: 'strict',
                 secure: true,
                 path: "/",
-                domain: req.body.domain
             })
         );
-    res.status(200).send(JSON.stringify({status: 'success'}));
+    res.status(200).json({status: 'success'});
 
     }).catch((err) => {
-        res.status(401).send('UNAUTHORIZED REQUEST');
+        res.status(401).json({
+            'status':'UNAUTHORIZED REQUEST',
+            'error': err,
+        });
     });  
 }

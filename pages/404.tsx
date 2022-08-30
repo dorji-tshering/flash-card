@@ -32,7 +32,7 @@ const PageNotFound = () => {
     return (
         <Layout>
             <Head>
-                <title key="title">Not Found</title>
+                <title>Not Found</title>
             </Head>
             <Container>
                 <p className="icon"><AiFillMeh size={34}/></p>

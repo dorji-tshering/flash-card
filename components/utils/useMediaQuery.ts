@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 
 // check for a media match
 const useMediaQuery = (maxWidth: string) => {
-    const [mediaMatch, setMediaMatch] = useState(false);
+    const [mediaMatch, setMediaMatch] = useState<boolean>(false);
 
     const updateTarget = useCallback((e: MediaQueryListEvent) => {
         if (e.matches) {

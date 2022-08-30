@@ -21,8 +21,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
     if(!cookieObject) {
         return { 
             props: {
-                userId: userId,
-                noteCategories: noteCategories
+                userId: null,
+                noteCategories: []
             } 
         }
     } 

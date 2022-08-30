@@ -39,7 +39,7 @@ export const emailValidate = (email: string, setError: Function) => {
             if(!allowedEmails.includes(email)) {
                 setError((error: {email: string, password: string}) => { 
                     return {
-                        email: 'Email is not allowed',
+                        email: 'Email is not allowed.',
                         password: error.password
                     }
                 });
@@ -65,7 +65,7 @@ export const passwordValidate = (password: string, setError: Function) => {
         setError((error: {email: string, password: string}) => { 
             return {
                 email: error.email,
-                password: 'Password is required'
+                password: 'Password is required.'
             }
         });
         isValid = false;
@@ -73,7 +73,7 @@ export const passwordValidate = (password: string, setError: Function) => {
         setError((error: {email: string, password: string}) => { 
             return {
                 email: error.email,
-                password: 'Password must contain at least 6 characters'
+                password: 'Password must contain at least 6 characters.'
             }
         });
         isValid = false;

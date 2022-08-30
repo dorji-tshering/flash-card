@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
-import { collection, CollectionReference, doc, DocumentData, getDoc, getDocs } from '@firebase/firestore';
+import { doc, getDoc } from '@firebase/firestore';
 import cookie from 'cookie';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -8,7 +8,6 @@ import CategoryContent from "../../components/category/CategoryContent";
 import Layout from "../../components/layout/Layout";
 import { database } from '../../firebaseClient';
 import { verifySessionCookie } from '../../firebaseAdmin';
-import { User } from '@firebase/auth';
 import { useCategoryContext } from '../../components/utils/categoryContext';
 import { useEffect } from 'react';
 
@@ -71,7 +70,7 @@ const CardCategory = ({ noteCategories }) => {
             if(!categories.length >= noteCategories.length || categories.length === 0) {
                 setCategories(noteCategories);
             }
-    },[])
+    },[]);
  
     return (
         <>

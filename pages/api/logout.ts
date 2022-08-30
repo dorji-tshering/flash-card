@@ -10,5 +10,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             path: "/",
         })
     );
-    res.status(200).send({status: 'Successfully logged out.'});
+    res.status(200).json({
+        'status': 'Successfully logged out.'
+    });
 }

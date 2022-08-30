@@ -21,6 +21,8 @@ export default createGlobalStyle`
         box-sizing: border-box;
         font-family: 'DM Sans', sans-serif;
         transition: all .3s;
+        scrollbar-width: thin;
+        scrollbar-color: blue orange;
     }
 
     body {
@@ -88,11 +90,6 @@ export default createGlobalStyle`
 
     ul {
         padding: 0;
-    }
-
-    * {
-        scrollbar-width: thin;
-        scrollbar-color: blue orange;
     }
 
     *::-webkit-scrollbar {
