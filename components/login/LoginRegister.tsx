@@ -137,7 +137,7 @@ const LoginRegister = ({ onClickOutside }) => {
             }catch(err) {
                 setLoginError(err.code);
                 setLoading(false); 
-                return;
+                return; 
             }
 
             const user = userCredential.user;

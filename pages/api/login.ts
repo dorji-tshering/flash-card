@@ -4,10 +4,16 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { createSessionCookie } from '../../firebaseAdmin';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
+    if(req.body.idToken === undefined) {
+        res.status(400).json({
+            'stats': 'Bad Request'
+        });
+        return;
+    }
     const idToken = req.body.idToken.toString();
     const expiresIn = 60 * 60 * 24 * 5 * 1000;
     
-    createSessionCookie(idToken, {
+    createSessionCookie(idToken, { 
         expiresIn: expiresIn
     }).then((sessionCookie) => {
         res.setHeader("Set-Cookie",
