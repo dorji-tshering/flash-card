@@ -15,11 +15,29 @@ const Container = styled.div`
     transform: translateX(-100%);
     background: var(--main-background-color);
     z-index: 1;
-    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
 
     &.show {
         transform: none;
         transition: all .3s;
+    }
+
+    .logo-text {
+        font-size: 18px;
+        margin: 10px 0px 10px 10px;
+
+        span {
+            display: inline-block;
+
+            &.flash {
+                color: var(--theme-color);
+            }
+    
+            &.card {
+                color: var(--yellow-color);
+                margin-left: 5px;
+            }
+        }
     }
 
     .close-menu {
@@ -53,10 +71,11 @@ const MobileMenu = ({ showMenu, setShowMenu}: MenuProps) => {
             ref.current.style.transition = 'all .3s';
         }
         setShowMenu(false);
-    } 
+    }  
 
     return (
         <Container ref={ref} className={showMenu ? 'show' : ''}>
+            <div className="logo-text"><span className="flash">Flash</span><span className="card">Card</span></div>
             { currentUser ? 
                 <UserMenu/>
             :

@@ -115,7 +115,7 @@ const NotesContainer = ({ notes }: Props) => {
 
         setSliderData(sliderData);
         setShowSlider(true);
-    }
+    } 
 
     return (
         <GridContainer>

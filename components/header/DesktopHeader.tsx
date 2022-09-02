@@ -1,11 +1,8 @@
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { BsQuestionOctagon } from 'react-icons/bs';
-import { doc, getDoc } from 'firebase/firestore';
+import Router from 'next/router';
 
-import { database } from '../../firebaseClient';
 import { useAuthValue } from '../utils/authContext';
 import { logOutHelper } from '../utils/logoutHelper';
 import { useCategoryContext } from '../utils/categoryContext';
@@ -38,6 +35,10 @@ const Container = styled.header`
                 a {
                     color: var(--primary-text-color);
                     text-transform: capitalize;
+
+                    &.active {
+                        color: var(--yellow-color);
+                    }
 
                     &:hover {
                         color: var(--yellow-color);
@@ -134,7 +135,7 @@ const DesktopHeader = ({ setShowLogin, setCreateCard }: Props) => {
                                 return (
                                     <li key={idx}>
                                         <Link href={`/category/${category}`}>
-                                            <a>{category}</a>
+                                            <a className={Router.query?.id === category ? 'active' : ''}>{category}</a>
                                         </Link>
                                     </li>)
                             }) }

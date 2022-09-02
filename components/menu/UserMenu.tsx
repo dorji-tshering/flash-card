@@ -1,37 +1,55 @@
 import styled from 'styled-components';
 import Link from 'next/link';
+import Router from 'next/router';
 
 import { useAuthValue } from '../utils/authContext';
 import { useCategoryContext } from '../utils/categoryContext';
 
 const Container = styled.div`
-
-    * {
-        text-align: center;
-    }
+    height: 100%;
 
     .user {
         font-weight: 400;
         color: var(--secondary-text-color);
+        position: absolute;
+        bottom: 0px;
+        text-align: center;
+        width: 100%;
+        margin: 0px;
+        padding: 20px;
+        border-top: 1px solid var(--border-color);
+        background: var(--main-background-color);
+    }
+
+    .wrapper {
+        overflow-y: auto;
+        height: 100%;
     }
 
     .category-title {
         font-weight: 500;
-        margin-top: 30px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid var(--secondary-text-color);
+        margin: 0;
+        padding: 15px 0px 15px 20px;
+        border-bottom: 1px solid var(--border-color);
         text-transform: uppercase;
-        font-size: 13px;
+        font-size: 9px;
+        letter-spacing: 2px;
     }
 
     .category-wrapper {
+        margin: 0;
+
         li {
             list-style-type: none;
 
             a {
                 display: block;
                 color: var(--primary-text-color);
-                padding: 15px;
+                padding: 15px 20px;
+
+                &.active {
+                    color: var(--yellow-color);
+                }
             }
         }
     }
@@ -39,6 +57,7 @@ const Container = styled.div`
     .no-category {
         padding: 30px;
         margin-top: 100px;
+        text-align: center;
     }
 `;
 
@@ -50,18 +69,18 @@ const UserMenu = () => {
         <Container>
             <h4 className="user">{currentUser.email}</h4>
             { categories.length > 0 ?
-                <>
-                    <h3 className="category-title">Category</h3> 
+                <div className="wrapper">
+                    <h3 className="category-title">{categories.length === 1 ? 'Category' : 'Categories'}</h3> 
                     <ul className="category-wrapper">
                         { categories.map((cat: string, idx: number) => (
                             <li key={idx} className="category">
                                 <Link href={`/category/${cat}`}>
-                                    <a>{cat}</a>
+                                    <a className={Router.query?.id === cat ? 'active' : ''}>{cat}</a>
                                 </Link>
                             </li>
                         ))}
                     </ul>
-                </>
+                </div>
             :
             <div className="no-category">
                 <p>You don't have any categories for now. It will appear here once you start creating cards.</p>

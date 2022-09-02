@@ -12,6 +12,28 @@ import HomeContent from '../components/home/HomeContent';
 import { useCategoryContext } from '../components/utils/categoryContext';
 import { useEffect } from 'react';
 
+export default function Home({ userId, noteCategories }) {
+    const { categories, setCategories } = useCategoryContext();
+
+    useEffect(() => {
+        if(categories.length === 0) {
+            setCategories(noteCategories);
+        }
+    },[])
+
+    return (
+        <>
+            <Head>
+                <title key='title'>FC: Home</title>
+            </Head>
+            <Layout>
+                <HomeContent userId={userId}/>
+            </Layout>
+        </>
+    );
+}
+
+
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
     let userId: string = null;
     let noteCategories: string[] = [];
@@ -62,24 +84,3 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
         }
     }
 } 
-
-export default function Home({ userId, noteCategories }) {
-    const { categories, setCategories } = useCategoryContext();
-
-    useEffect(() => {
-        if(categories.length === 0) {
-            setCategories(noteCategories);
-        }
-    },[])
-
-    return (
-        <>
-            <Head>
-                <title key='title'>FC: Home</title>
-            </Head>
-            <Layout>
-                <HomeContent userId={userId}/>
-            </Layout>
-        </>
-    );
-}

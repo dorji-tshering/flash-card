@@ -5,8 +5,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     if(req.body.key !== 'key123') {
-        res.status(403).json({
-            'status': 'Forbidden',
+        res.status(400).json({
+            'status': 'Bad Request',
         });
     }else {
         res.setHeader("Set-Cookie",

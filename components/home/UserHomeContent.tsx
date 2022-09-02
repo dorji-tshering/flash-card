@@ -32,7 +32,7 @@ const Container = styled.div`
                 position: absolute;
                 display: flex;
                 flex-direction: column;
-                background: var(--dark-background-color);
+                background: var(--light-background-color);
                 border-radius: 5px;
                 right: 0;
                 top: 50px;
@@ -46,8 +46,12 @@ const Container = styled.div`
                     padding: 10px 30px;
                     cursor: pointer;
 
+                    &.active {
+                        background: var(--theme-color);
+                    }
+
                     &:hover {
-                        background: var(--light-background-color);
+                        background: var(--theme-color);
                     }
 
                 }
@@ -102,6 +106,7 @@ const UserHomeContent = () => {
     const [oriNotes, setOriNotes] = useState<Array<DocumentData>>([]);
     const [filteredNotes, setFilteredNotes] = useState<Array<DocumentData>>([]);
     const [showFilter, setShowFilter] = useState<boolean>(false);
+    const [activeFilter, setActiveFilter] = useState<string>('default');
     const [loading, setLoading] = useState(true);
     const { currentUser } = useAuthValue();
     const { categories } = useCategoryContext();
@@ -110,7 +115,6 @@ const UserHomeContent = () => {
     // fetch notes for the userId
     useEffect(() => {
         const getNotes = async () =>{
-            setLoading(true);
             let tempNotes: DocumentData[] = [];
     
             const promises: [] = categories.map((category: string) => {
@@ -129,6 +133,7 @@ const UserHomeContent = () => {
         }
 
         if(currentUser) {
+            setLoading(true);
             getNotes();
         }
     }, [categories, currentUser, render]);
@@ -137,10 +142,13 @@ const UserHomeContent = () => {
     const filterNotes = (filter: string) => {
         setLoading(true);
         if(filter === 'default') {
+            setActiveFilter('default');
             setFilteredNotes(oriNotes);
         } else if (filter === 'known') {
+            setActiveFilter('known');
             setFilteredNotes(oriNotes.filter((note) => note.data().known === true));
         } else if(filter === 'unknown') {
+            setActiveFilter('unknown');
             setFilteredNotes(oriNotes.filter((note) => note.data().known === false));
         }
         setShowFilter(false);
@@ -160,9 +168,9 @@ const UserHomeContent = () => {
                                 <button onClick={() => setShowFilter(!showFilter)} className="toggle-filter"><BiFilter size={22}/></button>
                                 { showFilter ? 
                                     <div className="filter-options">
-                                        <span onClick={() => filterNotes('default')} className="filter">Default</span>
-                                        <span onClick={() => filterNotes('known')} className="filter">Known</span>
-                                        <span onClick={() => filterNotes('unknown')} className="filter">Unknown</span>
+                                        <span onClick={() => filterNotes('default')} className={`filter ${activeFilter === 'default' ? 'active' : ''}`}>Default</span>
+                                        <span onClick={() => filterNotes('known')} className={`filter ${activeFilter === 'known' ? 'active' : ''}`}>Known</span>
+                                        <span onClick={() => filterNotes('unknown')} className={`filter ${activeFilter === 'unknown' ? 'active' : ''}`}>Unknown</span>
                                     </div>
                                     :
                                     ''

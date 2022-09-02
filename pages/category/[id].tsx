@@ -11,17 +11,30 @@ import { verifySessionCookie } from '../../firebaseAdmin';
 import { useCategoryContext } from '../../components/utils/categoryContext';
 import { useEffect } from 'react';
 
+export default function CardCategory({ noteCategories }) {
+    const { categories, setCategories } = useCategoryContext();
+
+    useEffect(() => {
+            if(!categories.length >= noteCategories.length || categories.length === 0) {
+                setCategories(noteCategories);
+            }
+    },[]);
+ 
+    return (
+        <>
+            <Head>
+                <title key='title'>{`FC: ${useRouter().query.id}`}</title>
+            </Head>
+            <Layout>
+                <CategoryContent/>
+            </Layout>
+        </>
+    );
+}
+
 export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePropsContext) => {
     let noteCategories: string[] = [];
     const cookieObject: string = ctx.req.headers.cookie;
-
-    if(!cookieObject) {
-        return { 
-            props: {
-                noteCategories: noteCategories,
-            }
-        }
-    }
 
     const getCategories = async (uid: string) => {
         const catSnapShot = await getDoc(doc(database, 'CategoryCollection', uid));
@@ -62,26 +75,3 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
         }
     }
 }
-
-const CardCategory = ({ noteCategories }) => {
-    const { categories, setCategories } = useCategoryContext();
-
-    useEffect(() => {
-            if(!categories.length >= noteCategories.length || categories.length === 0) {
-                setCategories(noteCategories);
-            }
-    },[]);
- 
-    return (
-        <>
-            <Head>
-                <title key='title'>{`FC: ${useRouter().query.id}`}</title>
-            </Head>
-            <Layout>
-                <CategoryContent/>
-            </Layout>
-        </>
-    );
-}
-
-export default CardCategory;

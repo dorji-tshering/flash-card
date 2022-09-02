@@ -289,6 +289,7 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
         }).then(() => {
             note.data().known = !note.data().known;
             setNotification('Update successfull. Changes will appear after the slider is closed.');
+            toggleRender(!render);
             setLoading(false);
         }).catch((err) => {
             console.log(err.code);
@@ -341,7 +342,7 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
                 ''
             }
 
-            <span onClick={() => {setShowSlider(false); toggleRender(!render)}} className="close-slider flex center-content">
+            <span onClick={() => setShowSlider(false)} className="close-slider flex center-content">
                 <IoCloseSharp size={30}/>
             </span>
             <div className="left flex center-content">

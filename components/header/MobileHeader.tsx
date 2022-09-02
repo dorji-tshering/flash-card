@@ -1,12 +1,10 @@
-import { useState } from 'react';
 import { TbMenu } from 'react-icons/tb';
-import { FiPlus } from 'react-icons/fi';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { useAuthValue } from '../utils/authContext';
-import { logOutHelper } from '../utils/logoutHelper';
 import { BiLogOutCircle } from 'react-icons/bi';
 
+import { useAuthValue } from '../utils/authContext';
+import { logOutHelper } from '../utils/logoutHelper';
 
 const Container = styled.header`
     background-color: var(--dark-background-color);
@@ -38,8 +36,8 @@ const Container = styled.header`
             margin-right: 15px;
             min-width: auto;
             border-radius: 50%;
-            width: 44px;
-            height: 44px;
+            width: 37px;
+            height: 37px;
             padding: 0;
         }
     }

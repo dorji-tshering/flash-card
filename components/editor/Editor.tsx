@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext } from 'react';
+import { useEffect, useState, createContext, Dispatch, SetStateAction } from 'react';
 import Router from 'next/router';
 import styled from 'styled-components';
 import { RiArrowDownSLine } from 'react-icons/ri';
@@ -17,7 +17,7 @@ import Success from '../notice/Success';
 import Loader from '../loader/Loader';
 import { useAuthValue } from '../utils/authContext';
 import { useCategoryContext } from '../utils/categoryContext';
-
+import { useRenderContext } from '../utils/renderContext';
 
 const Container  = styled.div`
     position: relative;
@@ -128,10 +128,17 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
     const [doneEditing, setDoneEditing] = useState<boolean>(false);
     const [showCategory, setShowCategory] = useState<boolean>(false);
     const [category, setCategory] = useState<string>(null);
-    const [textContent, setTextContent] = useState<string>(null);
+    const [textContent, setTextContent] = useState<string>(forEdit ? note.data().data : null);
     const [notification, setNotification] = useState<string>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [codeEditor, setCodeEditor] = useState(null);
+
+    let render: boolean = null;
+    let toggleRender: Dispatch<SetStateAction<boolean>> = null;
+    if(useRenderContext()) {
+        render = useRenderContext().render;
+        toggleRender = useRenderContext().toggleRender;
+    }
 
     // top level context 
     const { categories, setCategories } = useCategoryContext();
@@ -257,10 +264,10 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
         }).then(() => {
             note.data().data = contentType === 'text' ? textContent : codeEditor.getValue();
             setDoneEditing(true);
+            toggleRender(!render);
             setLoading(false);
             setNotification('Card updated successfully. Changes will appear after the slider is closed.');
-        }).catch(err => {
-            console.log(err.code);
+        }).catch(() => {
             setLoading(false);
         });
     }

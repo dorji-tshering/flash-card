@@ -6,7 +6,7 @@ import { createSessionCookie } from '../../firebaseAdmin';
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     if(req.body.idToken === undefined) {
         res.status(400).json({
-            'stats': 'Bad Request'
+            'status': 'Bad Request'
         });
         return;
     }
