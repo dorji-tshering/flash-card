@@ -288,11 +288,10 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
             known: !note.data().known,
         }).then(() => {
             note.data().known = !note.data().known;
-            setNotification('Update successfull. Changes will appear after the slider is closed.');
             toggleRender(!render);
+            setNotification('Update successfull. Changes will appear after the slider is closed.');
             setLoading(false);
-        }).catch((err) => {
-            console.log(err.code);
+        }).catch(() => {
             setLoading(false);
         });
     }
