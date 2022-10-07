@@ -6,8 +6,8 @@ const AuthContext = createContext(null);
 interface Props {
     children: React.ReactNode,
     value: {
-        currentUser: User,
-        setCurrentUser: Dispatch<SetStateAction<User>>
+        currentUserId: string,
+        setCurrentUserId: Dispatch<SetStateAction<string>>
     }
 }
 

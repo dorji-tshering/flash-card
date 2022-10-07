@@ -63,7 +63,7 @@ interface MenuProps {
 
 const MobileMenu = ({ showMenu, setShowMenu}: MenuProps) => {
     const ref = useRef(null);
-    const { currentUser } = useAuthValue();
+    const { currentUserId } = useAuthValue();
 
     function hideMenu() {
         // set style only once
@@ -76,7 +76,7 @@ const MobileMenu = ({ showMenu, setShowMenu}: MenuProps) => {
     return (
         <Container ref={ref} className={showMenu ? 'show' : ''}>
             <div className="logo-text"><span className="flash">Flash</span><span className="card">Card</span></div>
-            { currentUser ? 
+            { currentUserId ? 
                 <UserMenu/>
             :
                 <GuestMenu/>

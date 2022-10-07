@@ -11,16 +11,16 @@ import { CatContextProvider } from '../components/utils/categoryContext';
 import Loader from '../components/loader/Loader';
 
 function MyApp({ Component, pageProps }) {
-	const [currentUser, setCurrentUser] = useState<User>(null);
+	const [currentUserId, setCurrentUserId] = useState<string>(null);
 	const [categories, setCategories] = useState<string[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 
 	useEffect(() => {
 		onAuthStateChanged(auth, (user) => {
 			if(user) {
-				setCurrentUser(user);
+				setCurrentUserId(user.uid);
 			}else {
-				setCurrentUser(null);
+				setCurrentUserId(null);
 			} 
 		});
 	},[]);
@@ -48,8 +48,8 @@ function MyApp({ Component, pageProps }) {
 				:
 				<>
 				<AuthProvider value={{
-					currentUser: currentUser,
-					setCurrentUser: setCurrentUser
+					currentUserId: currentUserId,
+					setCurrentUserId: setCurrentUserId
 					}}>
 					<CatContextProvider value={{
 						categories: categories,

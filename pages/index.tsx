@@ -1,23 +1,27 @@
-
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import cookie from 'cookie';
-import { verifySessionCookie } from '../firebaseAdmin';
-import { DocumentData, DocumentReference, getDoc, getDocs } from '@firebase/firestore';
-import { database } from '../firebaseClient';
+import { DocumentData, DocumentReference, getDoc } from '@firebase/firestore';
 import { doc } from 'firebase/firestore';
 import Head from 'next/head';
+import { useEffect } from 'react';
 
+import { database, auth } from '../firebaseClient';
+import { verifySessionCookie } from '../firebaseAdmin';
 import Layout from '../components/layout/Layout';
 import HomeContent from '../components/home/HomeContent';
 import { useCategoryContext } from '../components/utils/categoryContext';
-import { useEffect } from 'react';
+import { useAuthValue } from '../components/utils/authContext';
 
 export default function Home({ userId, noteCategories }) {
     const { categories, setCategories } = useCategoryContext();
-
+    const { currentUserId, setCurrentUserId } = useAuthValue();
+ 
     useEffect(() => {
-        if(categories.length === 0) {
+        if(categories.length === 0 && noteCategories.length > 0) {
             setCategories(noteCategories);
+        }
+        if(userId && currentUserId === null) {
+            setCurrentUserId(userId);
         }
     },[])
 
@@ -68,7 +72,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
         const categoryDocRef = doc(database, "CategoryCollection", userId);
         await getCategories(categoryDocRef);
     } catch(err) {
-        console.log(err);
         return {
             props: {
                 userId: null,

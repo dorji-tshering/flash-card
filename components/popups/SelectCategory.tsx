@@ -89,8 +89,6 @@ interface Props {
 
 const CategorySelect = ({ goBack, category, setCategory }: Props) => {
     const [showAddNew, setShowAddNew] = useState(false);
-    const [loading, setLoading] = useState<boolean>(false);
-    
     const { categories } = useCategoryContext();
 
     const chooseCategory = (event: React.MouseEvent<HTMLLIElement>, category: string) => {

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import Router from 'next/router';
 
-import { useAuthValue } from '../utils/authContext';
+import { auth } from '../../firebaseClient';
 import { useCategoryContext } from '../utils/categoryContext';
 
 const Container = styled.div`
@@ -63,11 +63,10 @@ const Container = styled.div`
 
 const UserMenu = () => {
     const { categories } = useCategoryContext();
-    const { currentUser } = useAuthValue();
 
     return (
         <Container>
-            <h4 className="user">{currentUser.email}</h4>
+            <h4 className="user">{ auth.currentUser.email }</h4>
             { categories.length > 0 ?
                 <div className="wrapper">
                     <h3 className="category-title">{categories.length === 1 ? 'Category' : 'Categories'}</h3> 

@@ -1,6 +1,6 @@
 export const emailValidate = (email: string, setError: Function) => {
     let isValid = true;
-    const allowedEmails = ['dorji@gmail.com'];
+    const allowedEmails = ['dorji@gmail.com', 'dorji.contact@gmail.com'];
 
     if(email === '') {
         setError((error: {email: string, password: string}) => { 
@@ -10,7 +10,7 @@ export const emailValidate = (email: string, setError: Function) => {
             }
         });
         isValid = false;
-    }else if(!email.includes('@')) {
+    }else if(!email.includes('@')) { 
         setError((error: {email: string, password: string}) => { 
             return {
                 email: 'Email must contain @ symbol',

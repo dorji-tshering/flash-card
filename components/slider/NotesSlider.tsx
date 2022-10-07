@@ -258,7 +258,7 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
     const [confirmDelete, showConfirmDelete] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const { setShowSlider } = useSliderContextValue();
-    const { currentUser } = useAuthValue();
+    const { currentUserId } = useAuthValue();
     const { render, toggleRender } = useRenderContext();
 
     const nextNote = () => {
@@ -283,7 +283,7 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
 
     const toggleKnown = (note: DocumentData) => {
         setLoading(true);
-        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.id);
+        const docRef = doc(database, 'CategoryCollection', currentUserId, note.data().category, note.id);
         updateDoc(docRef, {
             known: !note.data().known,
         }).then(() => {
@@ -298,7 +298,7 @@ const NotesSlider = ({ notes, currentNote }: Props) => {
 
     const deleteNote = (note: DocumentData) => {
         setLoading(true);
-        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.id);
+        const docRef = doc(database, 'CategoryCollection', currentUserId, note.data().category, note.id);
         deleteDoc(docRef).then(() => {
             notes.splice(notes.indexOf(note), 1);
             if(notes.length === 0) {

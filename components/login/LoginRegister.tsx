@@ -1,14 +1,15 @@
 import React, { useState, useRef } from 'react';
 import Router from 'next/router';
+import styled from 'styled-components';
+import { createUserWithEmailAndPassword, getIdToken, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
 
 import Modal from '../modal/Modal';
-import styled from 'styled-components';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { emailValidate, passwordValidate } from '../utils/inputValidate';
 import { auth } from '../../firebaseClient';
-import { createUserWithEmailAndPassword, getIdToken, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
 import Loader from '../loader/Loader';
 import { useAuthValue } from '../utils/authContext';
+import ForgotPassword from '../popups/ForgotPassword';
 
 const Container = styled.div`
     padding: 30px;
@@ -16,6 +17,9 @@ const Container = styled.div`
     h2 {
         text-align: center;
         margin-top: 0;
+        text-transform: uppercase;
+        letter-spacing: 5px;
+        color: var(--secondary-text-color);
     }
 
     .to-login span, .to-register span {
@@ -26,6 +30,16 @@ const Container = styled.div`
     .to-login, .to-register {
         text-align: center;
         margin-top: 20px;
+
+        span {
+            color: var(--secondary-text-color);
+
+            &:hover {
+                border-bottom: 1px dotted var(--border-color);
+                color: var(--primary-text-color);
+                transition: all 0s;
+            }
+        }
     }
 
     input {
@@ -71,6 +85,22 @@ const Container = styled.div`
 
     }
 
+    .forgot-password {
+        margin-bottom: 15px;
+        text-align: right;
+
+        .link {
+            cursor: pointer;
+            color: var(--secondary-text-color);
+
+            &:hover {
+                color: var(--primary-text-color);
+                border-bottom: 1px dotted var(--border-color);
+                transition: all 0s;
+            }
+        }
+    }
+
     @media screen and (max-width: 480px) {
         & {
             padding: 0;
@@ -89,8 +119,6 @@ const Container = styled.div`
     }
 `;
 
-
-
 const LoginRegister = ({ onClickOutside }) => {
     const [onLoginForm, setOnLoginForm] = useState<boolean>(true);
     const [email, setEmail] = useState<string>('');
@@ -99,12 +127,13 @@ const LoginRegister = ({ onClickOutside }) => {
     const [loginError, setLoginError] = useState<string>(null);
     const [signupError, setSignupError] = useState<string>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const [forgotPassword, showForgotPassword] = useState<boolean>(false);
     const [errors, setError] = useState<{ email: string, password: string }>({
         email: '',
         password: '',
     });
 
-    const { setCurrentUser } = useAuthValue();
+    const { setCurrentUserId } = useAuthValue();
 
     const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -128,7 +157,7 @@ const LoginRegister = ({ onClickOutside }) => {
         event.preventDefault();
         let validEmail = emailValidate(email, setError);
         let validPassword = passwordValidate(password, setError); 
-
+ 
         if(validEmail && validPassword) {
             let userCredential: UserCredential;
             try {
@@ -157,7 +186,7 @@ const LoginRegister = ({ onClickOutside }) => {
                 setLoading(false);
                 onClickOutside();
                 Router.replace('/');
-                setCurrentUser(user);
+                setCurrentUserId(user.uid);
             }else if(response.status === 401) {
                 console.log(response.json());
             }
@@ -198,7 +227,7 @@ const LoginRegister = ({ onClickOutside }) => {
                 setLoading(false);
                 onClickOutside();
                 Router.replace('/');
-                setCurrentUser(user);
+                setCurrentUserId(user.uid);
             }
         }
     }
@@ -207,35 +236,38 @@ const LoginRegister = ({ onClickOutside }) => {
         <Modal onClickOutside={onClickOutside} className='login-register'>
             { loading && <Loader background="transparent"/> }
             <Container className="login-register-wrapper">
-                { onLoginForm ? 
-                    <form onSubmit={handleLogin} className="form-login" noValidate>
-                        { loginError && <p className="login-error">{ loginError }</p> }
-                        <h2>Login</h2>
-                        <input 
-                            type="email" 
-                            onChange={(ev) => {setEmail(ev.target.value)}} 
-                            placeholder='Email'
-                            value={email}    
-                        />
-                        { errors.email && <span className="error">{ errors.email }</span> }
-                        <span className="password-input-wrap">
+                { onLoginForm ?
+                    <> 
+                        { forgotPassword ? <ForgotPassword back={() => showForgotPassword(false)}/> : ''}
+                        <form onSubmit={handleLogin} className="form-login" noValidate>
+                            { loginError && <p className="login-error">{ loginError }</p> }
+                            <h2>Login</h2>
                             <input 
-                                type="password" 
-                                ref={passwordRef} 
-                                onChange={(ev) => {setPassword(ev.target.value)}} 
-                                placeholder='Password'
-                                value={password}
-                            />                           
-                            { showPassword ? 
-                                <AiOutlineEyeInvisible className='password-toggle-icon' onClick={ () => { passwordHide(); setShowPassword(!showPassword)} } /> 
-                                : 
-                                <AiOutlineEye className='password-toggle-icon' onClick={ () => { passwordShow(); setShowPassword(!showPassword)} }/> 
-                            }
-                        </span>
-                        { errors.password && <span className="error">{ errors.password }</span> }
-                        <button type="submit" className='primary-button' value='Log in'>Log in</button>
-                        <p className="to-register"><span onClick={() => toggleLogin()}>Sign up</span></p>
-                    </form> 
+                                type="email" 
+                                onChange={(ev) => {setEmail(ev.target.value)}} 
+                                placeholder='Email'
+                                value={email}    
+                            />
+                            { errors.email && <span className="error">{ errors.email }</span> }
+                            <span className="password-input-wrap">
+                                <input 
+                                    type="password" 
+                                    ref={passwordRef} 
+                                    onChange={(ev) => {setPassword(ev.target.value)}} 
+                                    placeholder='Password'
+                                    value={password}
+                                />                           
+                                { showPassword ? 
+                                    <AiOutlineEyeInvisible className='password-toggle-icon' onClick={ () => { passwordHide(); setShowPassword(!showPassword)} } /> 
+                                    : 
+                                    <AiOutlineEye className='password-toggle-icon' onClick={ () => { passwordShow(); setShowPassword(!showPassword)} }/> 
+                                }
+                            </span>
+                            { errors.password && <span className="error">{ errors.password }</span> }
+                            <button type="submit" className='primary-button' value='Log in'>Log in</button>
+                            <p className="to-register"><span onClick={() => toggleLogin()}>New to FC? Sign up</span></p>
+                        </form> 
+                    </>
                     :
                     <form onSubmit={handleRegister} className="form-register" noValidate>
                         { signupError && <p className="signup-error">{ signupError }</p> }
@@ -263,12 +295,15 @@ const LoginRegister = ({ onClickOutside }) => {
                         </span>      
                         { errors.password && <span className="error">{ errors.password }</span> }             
                         <button type="submit" className='primary-button' value='Sign up'>Sign up</button>
-                        <p className="to-login"><span onClick={() => toggleLogin()}>Login</span></p>
+                        <p className="to-login"><span onClick={() => toggleLogin()}>Have an account? Login</span></p>
                     </form> 
                 }
             </Container>
         </Modal>
     )
 }
+
+//<p className="forgot-password"><span onClick={() => showForgotPassword(true)} className="link">Forgot password?</span></p>
+
 
 export default LoginRegister;

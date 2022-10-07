@@ -108,7 +108,7 @@ const UserHomeContent = () => {
     const [showFilter, setShowFilter] = useState<boolean>(false);
     const [activeFilter, setActiveFilter] = useState<string>('default');
     const [loading, setLoading] = useState(true);
-    const { currentUser } = useAuthValue();
+    const { currentUserId } = useAuthValue();
     const { categories } = useCategoryContext();
     const { render } = useRenderContext();
 
@@ -118,7 +118,7 @@ const UserHomeContent = () => {
             let tempNotes: DocumentData[] = [];
     
             const promises: [] = categories.map((category: string) => {
-                const userCategoriesRef = collection(database, 'CategoryCollection', currentUser.uid, category);
+                const userCategoriesRef = collection(database, 'CategoryCollection', currentUserId, category);
                 return getDocs(userCategoriesRef); // returns a promise
             });   
     
@@ -132,11 +132,11 @@ const UserHomeContent = () => {
             setLoading(false);
         }
 
-        if(currentUser) {
+        if(currentUserId) {
             setLoading(true);
             getNotes();
         }
-    }, [categories, currentUser, render]);
+    }, [categories, currentUserId, render]);
 
     // filter function for notes 
     const filterNotes = (filter: string) => {

@@ -61,7 +61,6 @@ export const getServerSideProps: GetServerSideProps = async(ctx: GetServerSidePr
         await getCategories(uid);
 
     } catch(err) {
-        console.log('Error: ' + err);
         return {
             props: {
                 noteCategories: noteCategories,

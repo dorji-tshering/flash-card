@@ -13,8 +13,6 @@ import NotesSlider from '../slider/NotesSlider';
 import { SliderProvider } from '../utils/sliderContext';
 import { RenderContextProvider } from '../utils/renderContext';
 
-
-
 const Container = styled.div`
     background-color: var(--main-background-color);
     display: flex;

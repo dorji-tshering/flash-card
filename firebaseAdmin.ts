@@ -1,5 +1,6 @@
 import admin from 'firebase-admin';
 import { SessionCookieOptions } from 'firebase-admin/lib/auth/base-auth';
+import { UserRecord } from 'firebase-admin/lib/auth/user-record';
 
 // directly parse the json credentials
 if(!admin.apps.length) {

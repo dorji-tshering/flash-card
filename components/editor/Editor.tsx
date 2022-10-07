@@ -148,7 +148,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
         setCategory: setCategory,
     }
 
-    const { currentUser } = useAuthValue();
+    const { currentUserId } = useAuthValue();
     // set up ace code editor 
     useEffect(() => {
         // only if the contentType is code 
@@ -208,18 +208,18 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
         }
 
         setLoading(true);
-        const categoryCollectionRef = collection(database, 'CategoryCollection', currentUser.uid, category );
+        const categoryCollectionRef = collection(database, 'CategoryCollection', currentUserId, category );
         const cardData = {
             data: contentType === 'text' ? textContent : codeEditor.getValue(),
             category: category,
-            userId: currentUser.uid,
+            userId: currentUserId,
             contentType : contentType,
             language: contentType === 'code' ? language : null,
             known: false
         } 
 
         // create or update user document containing categroies field
-        const docRef = doc(database, "CategoryCollection", currentUser.uid);
+        const docRef = doc(database, "CategoryCollection", currentUserId);
         const document = await getDoc(docRef);
         if(document.exists()) {
             await updateDoc(docRef, {
@@ -257,7 +257,7 @@ const Editor = ({ goBack, contentType, language, note, forEdit=false }: Props) =
             }
         }
 
-        const docRef = doc(database, 'CategoryCollection', currentUser.uid, note.data().category, note.id);
+        const docRef = doc(database, 'CategoryCollection', currentUserId, note.data().category, note.id);
         setLoading(true);
         updateDoc(docRef, {
             data: contentType === 'text' ? textContent : codeEditor.getValue(),

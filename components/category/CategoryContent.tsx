@@ -57,26 +57,26 @@ const CategoryContent = () => {
     const [notes, setNotes] = useState<Array<DocumentData>>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const { categories, setCategories } = useCategoryContext();
-    const { currentUser } = useAuthValue();
+    const { currentUserId } = useAuthValue();
     const category = useRouter().query.id as string;
     const router = useRouter();
     const { render } = useRenderContext();
- 
+
     useEffect(() => {
         const getCategories = async () => {
-            const collRef = collection(database, 'CategoryCollection', currentUser.uid, category);
+            const collRef = collection(database, 'CategoryCollection', currentUserId, category);
             const snapShot = await getDocs(collRef);
             setNotes([...snapShot.docs]);
             setLoading(false);
         }
-        if(currentUser) {
+        if(currentUserId) {
             getCategories();
         }
-    },[currentUser, render]);
+    },[currentUserId, render]);
 
 
     const deleteCategory = async () => {
-        const docRef = doc(database, 'CategoryCollection', currentUser.uid);
+        const docRef = doc(database, 'CategoryCollection', currentUserId);
         try {
             setLoading(true);
             await updateDoc(docRef, {
