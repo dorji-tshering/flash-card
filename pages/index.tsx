@@ -21,6 +21,7 @@ export default function Home({ userId, noteCategories }) {
             setCategories(noteCategories);
         }
         if(userId && currentUserId === null) {
+            console.log('reached inside');
             setCurrentUserId(userId);
         }
     },[])
