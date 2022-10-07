@@ -45,6 +45,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
     let noteCategories: string[] = [];
  
     const cookieObject: string = ctx.req.headers.cookie;
+    console.log(cookieObject);
     // return if no cookie found
     if(!cookieObject) {
         return { 
