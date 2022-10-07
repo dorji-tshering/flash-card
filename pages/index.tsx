@@ -15,6 +15,7 @@ import { useAuthValue } from '../components/utils/authContext';
 export default function Home({ userId, noteCategories }) {
     const { categories, setCategories } = useCategoryContext();
     const { currentUserId, setCurrentUserId } = useAuthValue();
+    console.log(`UserId from index:  ${userId}`);
  
     useEffect(() => {
         if(categories.length === 0 && noteCategories.length > 0) {
