@@ -5,7 +5,7 @@ import { doc } from 'firebase/firestore';
 import Head from 'next/head';
 import { useEffect } from 'react';
 
-import { database, auth } from '../firebaseClient';
+import { database } from '../firebaseClient';
 import { verifySessionCookie } from '../firebaseAdmin';
 import Layout from '../components/layout/Layout';
 import HomeContent from '../components/home/HomeContent';
@@ -20,6 +20,7 @@ export default function Home({ userId, noteCategories }) {
         if(categories.length === 0 && noteCategories.length > 0) {
             setCategories(noteCategories);
         }
+        
         if(userId && currentUserId === null) {
             setCurrentUserId(userId);
         }

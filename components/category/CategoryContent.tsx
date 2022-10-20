@@ -87,7 +87,6 @@ const CategoryContent = () => {
             setLoading(false);
             router.replace('/');
         }catch(err) {
-            console.log(err);
             setLoading(false);
         }
     }

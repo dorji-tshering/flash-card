@@ -25,6 +25,10 @@ const Container  = styled.div`
             }
         }
     }
+
+    .refresh-notice {
+        color: var(--secondary-text-color);
+    }
 `;
 
 const GuestHomeContent = () => {
@@ -34,6 +38,7 @@ const GuestHomeContent = () => {
             <div className="repo-link">
                 <a href="https://github.com/dorji-tshering/flash-card" className="github"><AiFillGithub size={34}/></a>
             </div>
+            <p className="refresh-notice">Refresh the page if you haven't logged out from your last login</p>
         </Container>
     );
 }

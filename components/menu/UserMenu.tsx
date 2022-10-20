@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import Router from 'next/router';
 
-import { auth } from '../../firebaseClient';
 import { useCategoryContext } from '../utils/categoryContext';
 
 const Container = styled.div`

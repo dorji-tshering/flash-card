@@ -205,7 +205,6 @@ const LoginRegister = ({ onClickOutside }) => {
                 userCredential = await createUserWithEmailAndPassword(auth, email, password);
             }catch(err) {
                 setSignupError(err.code);
-                console.log(err.code);
                 setLoading(false);
                 return;
             }

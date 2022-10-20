@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import Router from 'next/router'; 
 import Head from 'next/head';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '../firebaseClient';
 import "highlight.js/styles/atom-one-dark.css";
 
 import GlobalStyle from '../components/utils/global.css';
@@ -14,17 +12,6 @@ function MyApp({ Component, pageProps }) {
 	const [currentUserId, setCurrentUserId] = useState<string>(null);
 	const [categories, setCategories] = useState<string[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
-
-	
-	/*useEffect(() => {
-		onAuthStateChanged(auth, (user) => {
-			if(user) {
-				setCurrentUserId(user.uid);
-			}else {
-				setCurrentUserId(null);
-			} 
-		});
-	},[]);*/
 	
 	useEffect(() => {
 		Router.events.on('routeChangeStart', () => setLoading(true));
