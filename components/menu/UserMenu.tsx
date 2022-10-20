@@ -8,7 +8,7 @@ import { useCategoryContext } from '../utils/categoryContext';
 const Container = styled.div`
     height: 100%;
 
-    .user {
+    .github-link {
         font-weight: 400;
         color: var(--secondary-text-color);
         position: absolute;
@@ -66,7 +66,9 @@ const UserMenu = () => {
 
     return (
         <Container>
-            <h4 className="user">{ auth.currentUser.email }</h4>
+            <Link href="https://github.com/dorji-tshering/flash-card">
+                <a className="github-link">Github</a>
+            </Link>
             { categories.length > 0 ?
                 <div className="wrapper">
                     <h3 className="category-title">{categories.length === 1 ? 'Category' : 'Categories'}</h3> 

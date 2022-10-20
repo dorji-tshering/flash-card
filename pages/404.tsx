@@ -4,11 +4,22 @@ import Layout from '../components/layout/Layout';
 import Link from 'next/link';
 import Head from 'next/head';
 
+const ParentContainer = styled.div`
+    background: var(--main-background-color);
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+`;
+
 const Container = styled.div`
     text-align: center;
 
+    .site-name {
+        margin-top: 100px;
+    }
+
     .icon {
-        margin-top: 150px;
         color: var(--secondary-text-color);
     }
 
@@ -30,11 +41,12 @@ const PageNotFound = () => {
 
 
     return (
-        <Layout>
+        <ParentContainer>
             <Head>
                 <title>Not Found</title>
             </Head>
             <Container>
+                <h2 className="site-name">FlashCard</h2>
                 <p className="icon"><AiFillMeh size={34}/></p>
                 <p className="message">Uhh oh! Looks like the page you are requesting doesn't exist.</p>
                 <div className="action">
@@ -43,7 +55,7 @@ const PageNotFound = () => {
                     </Link>
                 </div>
             </Container>
-        </Layout>  
+        </ParentContainer>  
     );
 }
 

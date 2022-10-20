@@ -115,7 +115,7 @@ interface Props {
 }
 
 const DesktopHeader = ({ setShowLogin, setCreateCard }: Props) => {
-    const { currentUserId } = useAuthValue();
+    const { currentUserId, setCurrentUserId } = useAuthValue();
     const { categories } = useCategoryContext();
 
     return (
@@ -150,7 +150,7 @@ const DesktopHeader = ({ setShowLogin, setCreateCard }: Props) => {
             <div className="action">
                 { currentUserId ? 
                     <>
-                        <button onClick={logOutHelper} className="logout secondary-button">Logout</button>
+                        <button onClick={() => logOutHelper(setCurrentUserId)} className="logout secondary-button">Logout</button>
                         <button onClick={() => setCreateCard(true)} className="create-card primary-button"> 
                             <span>Create</span>
                         </button>

@@ -12,7 +12,7 @@ interface Props {
 }
 
 const HomeContent = ({ userId }: Props) => {
-    console.log('UserId: ' + userId);
+
     return (
             <Container>
                 { userId ?

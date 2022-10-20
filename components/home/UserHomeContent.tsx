@@ -7,7 +7,7 @@ import NotesContainer from '../containers/NotesContainer';
 import { useAuthValue } from '../utils/authContext';
 import { useCategoryContext } from '../utils/categoryContext';
 import { database } from '../../firebaseClient';
-import { collection, DocumentData, getDocs, onSnapshot, query } from 'firebase/firestore';
+import { collection, DocumentData, getDocs } from 'firebase/firestore';
 import Loader from '../loader/Loader';
 import { useRenderContext } from '../utils/renderContext';
 
@@ -133,7 +133,6 @@ const UserHomeContent = () => {
         }
 
         if(currentUserId) {
-            setLoading(true);
             getNotes();
         }
     }, [categories, currentUserId, render]);

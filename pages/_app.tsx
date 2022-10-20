@@ -15,7 +15,8 @@ function MyApp({ Component, pageProps }) {
 	const [categories, setCategories] = useState<string[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 
-	useEffect(() => {
+	
+	/*useEffect(() => {
 		onAuthStateChanged(auth, (user) => {
 			if(user) {
 				setCurrentUserId(user.uid);
@@ -23,7 +24,7 @@ function MyApp({ Component, pageProps }) {
 				setCurrentUserId(null);
 			} 
 		});
-	},[]);
+	},[]);*/
 	
 	useEffect(() => {
 		Router.events.on('routeChangeStart', () => setLoading(true));

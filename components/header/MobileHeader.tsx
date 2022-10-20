@@ -54,7 +54,7 @@ interface MenuProps {
 }
 
 const MobileHeader = ({ setShowMenu, setShowLogin, setCreateCard }: MenuProps) => {
-    const { currentUserId } = useAuthValue();
+    const { currentUserId, setCurrentUserId } = useAuthValue();
 
     return (
         <Container className="mobile">
@@ -71,7 +71,7 @@ const MobileHeader = ({ setShowMenu, setShowLogin, setCreateCard }: MenuProps) =
             <div className="action">
                 { currentUserId ? 
                     <>
-                        <button onClick={logOutHelper} className="logout secondary-button"><BiLogOutCircle size={20}/></button>
+                        <button onClick={() => logOutHelper(setCurrentUserId)} className="logout secondary-button"><BiLogOutCircle size={20}/></button>
                         <button onClick={() => setCreateCard(true)} className="create-card primary-button"> 
                             <span>Create</span>
                         </button>
