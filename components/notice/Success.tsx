@@ -5,6 +5,7 @@ const Container = styled.div`
     padding: 10px 40px 10px 15px;
     background: var(--green-color);
     border-radius: 5px;
+    position: relative;
 
     .close {
         display: flex;
@@ -31,14 +32,16 @@ interface Props {
 }
 
 const Success = ({ message, closeable, setNotification }: Props) => {
-  return (
-    <Container>
-        <p className="message">
-            { message }
-        </p>
-        { closeable ? <span onClick={() => setNotification(null)} className="close"><CgClose/></span> : ''}
-    </Container>
-  )
+    console.log(closeable);
+
+    return (
+        <Container>
+            <p className="message">
+                { message }
+            </p>
+            { closeable ? <span onClick={() => setNotification(null)} className="close"><CgClose/></span> : ''}
+        </Container>
+    )
 }
 
 export default Success;

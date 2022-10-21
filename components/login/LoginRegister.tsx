@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import Router from 'next/router';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { createUserWithEmailAndPassword, getIdToken, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
 
@@ -9,7 +10,6 @@ import { emailValidate, passwordValidate } from '../utils/inputValidate';
 import { auth } from '../../firebaseClient';
 import Loader from '../loader/Loader';
 import { useAuthValue } from '../utils/authContext';
-import ForgotPassword from '../popups/ForgotPassword';
 
 const Container = styled.div`
     padding: 30px;
@@ -85,19 +85,19 @@ const Container = styled.div`
 
     }
 
-    .forgot-password {
+    .forgot-password-link {
         margin-bottom: 15px;
-        text-align: right;
+        margin-left: auto;
+        display: block;
+        width: fit-content;
+        border-bottom: 1px solid transparent;
+        cursor: pointer;
+        color: var(--secondary-text-color);
 
-        .link {
-            cursor: pointer;
-            color: var(--secondary-text-color);
-
-            &:hover {
-                color: var(--primary-text-color);
-                border-bottom: 1px dotted var(--border-color);
-                transition: all 0s;
-            }
+        &:hover {
+            color: var(--primary-text-color);
+            border-bottom: 1px dotted var(--border-color);
+            transition: all 0s;
         }
     }
 
@@ -127,7 +127,6 @@ const LoginRegister = ({ onClickOutside }) => {
     const [loginError, setLoginError] = useState<string>(null);
     const [signupError, setSignupError] = useState<string>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [forgotPassword, showForgotPassword] = useState<boolean>(false);
     const [errors, setError] = useState<{ email: string, password: string }>({
         email: '',
         password: '',
@@ -237,7 +236,6 @@ const LoginRegister = ({ onClickOutside }) => {
             <Container className="login-register-wrapper">
                 { onLoginForm ?
                     <> 
-                        { forgotPassword ? <ForgotPassword back={() => showForgotPassword(false)}/> : ''}
                         <form onSubmit={handleLogin} className="form-login" noValidate>
                             { loginError && <p className="login-error">{ loginError }</p> }
                             <h2>Login</h2>
@@ -263,6 +261,7 @@ const LoginRegister = ({ onClickOutside }) => {
                                 }
                             </span>
                             { errors.password && <span className="error">{ errors.password }</span> }
+                            <Link href="/forgot-password"><a className="forgot-password-link">Forgot password?</a></Link>
                             <button type="submit" className='primary-button' value='Log in'>Log in</button>
                             <p className="to-register"><span onClick={() => toggleLogin()}>New to FC? Sign up</span></p>
                         </form> 
@@ -301,8 +300,5 @@ const LoginRegister = ({ onClickOutside }) => {
         </Modal>
     )
 }
-
-//<p className="forgot-password"><span onClick={() => showForgotPassword(true)} className="link">Forgot password?</span></p>
-
 
 export default LoginRegister;
