@@ -1,6 +1,6 @@
 export const emailValidate = (email: string, setError: Function) => {
     let isValid = true;
-    const allowedEmails = ['dorji@gmail.com', 'dorji.contact@gmail.com'];
+    const allowedEmails = ['dorji.contact@gmail.com'];
 
     if(email === '') {
         setError((error: {email: string, password: string}) => { 
